@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "go_balls_HP"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP_shoot_2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Hang_hp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "hang"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

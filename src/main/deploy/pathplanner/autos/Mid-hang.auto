@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "middle_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Hang_mid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "hang"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "go_balls_mid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "throw"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

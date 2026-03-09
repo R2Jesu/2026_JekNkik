@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Depot_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "go_balls_Depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Depot_shoot_2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "hang_depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "hang"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
