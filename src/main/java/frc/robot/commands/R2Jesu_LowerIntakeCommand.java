@@ -11,17 +11,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
 /** An example command that uses an example subsystem. */
-public class R2Jesu_IntakeInCommand extends Command {
+public class R2Jesu_LowerIntakeCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     private final R2Jesu_IntakeSubsystem m_subsystem;
-// rotates the intake's wheels away from the robot.
+// rotates the intake's wheels towards the robot.
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param subsystem The subsystem used by this command.
      */
-    public R2Jesu_IntakeInCommand(R2Jesu_IntakeSubsystem subsystem) {
+    public R2Jesu_LowerIntakeCommand(R2Jesu_IntakeSubsystem subsystem) {
         m_subsystem = subsystem;
         // Use addRequirements() here to declare subsystem dependencies for each subsytem used
         addRequirements(subsystem);
@@ -31,6 +31,7 @@ public class R2Jesu_IntakeInCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        m_subsystem.lowerIntake();
     }
 
 
@@ -49,6 +50,6 @@ public class R2Jesu_IntakeInCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }
 }
