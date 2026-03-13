@@ -37,6 +37,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
 import frc.robot.commands.R2Jesu_ShooterModeShootWithLimelight;
+import frc.robot.commands.R2Jesu_ThrowCommand;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see setting
@@ -127,6 +128,7 @@ public class RobotContainer {
         //R2JESU Driver Buttons and such
         joystick.rightTrigger().whileTrue(new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
             joystick));
+        joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
         joystick.button(1).onTrue(
             new ConditionalCommand(

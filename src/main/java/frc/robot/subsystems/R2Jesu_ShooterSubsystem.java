@@ -4,17 +4,16 @@
 
 package frc.robot.subsystems;
 
-
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
-
-
 public class R2Jesu_ShooterSubsystem extends SubsystemBase {
-
- 
+ private SparkMax shooterMotor = new SparkMax(52, MotorType.kBrushless);
+ private SparkMax kickerbarMotor = new SparkMax(53, MotorType.kBrushed);
   /** Creates a new R2Jesu_ShooterSubsystem. */
 
   public R2Jesu_ShooterSubsystem() {
@@ -33,6 +32,7 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
+          shooterMotor.set(0.5);
           /* one-time action goes here */
         });
   }
@@ -40,16 +40,18 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
   
 
   public void runShooter(double speed) {
- 
-  } 
+    shooterMotor.set(speed);
+    if(speed > 0.0) {
+      kickerbarMotor.set(-1.0);
+    } else {
+      kickerbarMotor.set(0.0);
+    }
+  }
 
  
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    //SmartDashboard.putNumber("encoderdistance", hangerEncoder.getDistance());
-
    
   }
 
