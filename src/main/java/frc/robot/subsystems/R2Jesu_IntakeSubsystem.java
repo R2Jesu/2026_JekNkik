@@ -23,13 +23,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class R2Jesu_IntakeSubsystem extends SubsystemBase {
 
-  private SparkMax intake_armMotor = new SparkMax(54, MotorType.kBrushless);
-  private SparkMax intake_wheelsMotor = new SparkMax(53, MotorType.kBrushed);
+  private SparkMax intake_armMotor = new SparkMax(51, MotorType.kBrushless);
+  private SparkMax intake_wheelsMotor = new SparkMax(54, MotorType.kBrushless);
   private Encoder intake_armEncoder = new Encoder(0,1, true, CounterBase.EncodingType.k4X);
   private static int targetPosition=0;
-  private double intake_armPositions[] = {0.0, 1};
-  private PIDController m_armUpController = new PIDController(.15, 0.0, 0.0, 0.01); //p 1.5
-  private PIDController m_armDownController = new PIDController(.05, 0.0, 0.0, 0.01); //p 1.5
+  private double intake_armPositions[] = {0.0, 5000.0};
+  private PIDController m_armUpController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
+  private PIDController m_armDownController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
   private double up_pidOutput;
   private double down_pidOutput;
   private PWMConfigDataResult myResult; //no idea
@@ -73,7 +73,7 @@ public class R2Jesu_IntakeSubsystem extends SubsystemBase {
     //  TO DO: add checks to make sure robot is not against a wall
    public void lowerIntake() {
     targetPosition=1;
-    intake_wheelsMotor.set(Constants.default_intakeSpeed);
+    intake_wheelsMotor.set(.5);
   } 
 
   // raise the arm, stop wheels
@@ -90,7 +90,7 @@ public class R2Jesu_IntakeSubsystem extends SubsystemBase {
  
   // moves the intake arm at designated speed
   public void moveArm(double speed) {
-//    intake_armMotor.set(speed);
+    intake_armMotor.set(speed);
   } 
  
   @Override
