@@ -35,8 +35,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.R2Jesu_IntakeSubsystem;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
 import frc.robot.commands.R2Jesu_ShooterModeShootWithLimelight;
+import frc.robot.commands.R2Jesu_LowerIntakeCommand;
+import frc.robot.commands.R2Jesu_RaiseIntakeCommand;
 import frc.robot.commands.R2Jesu_ThrowCommand;
 
 public class RobotContainer {
@@ -55,9 +58,11 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController joystick2 = new CommandXboxController(1);
 
     public final DriveSubsystem m_robotDrive = TunerConstants.createDrivetrain();
     public final R2Jesu_ShooterSubsystem m_shooterSubsystem = new R2Jesu_ShooterSubsystem();
+    public final R2Jesu_IntakeSubsystem m_intakeSubsystem = new R2Jesu_IntakeSubsystem();
     // need to understand why drivetain doesnt = new DriveSubsystem();
 
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(5.0); // 3 m/s^2
@@ -137,6 +142,9 @@ public class RobotContainer {
             () -> m_robotDrive.getState().Pose.getY() < 2.94
             )
         );
+
+        joystick2.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
+        joystick2.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
 
     }
 
