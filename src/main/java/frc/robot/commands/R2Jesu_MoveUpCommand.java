@@ -5,7 +5,7 @@
 
 package frc.robot.commands;
 
-
+import frc.robot.subsystems.R2Jesu_IntakeSubsystem;
 import frc.robot.subsystems.R2Jesu_ClimberSubsystem; //replace with the subsytem(s) needed for your command
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** An example command that uses an example subsystem. */
 public class R2Jesu_MoveUpCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    private final R2Jesu_ClimberSubsystem m_subsystem;
+    private final R2Jesu_ClimberSubsystem m_climberSubsystem;
+    private final R2Jesu_IntakeSubsystem m_intakeSubsystem;
+
 // Retracts the robot's arm.
 
     /**
@@ -21,10 +23,19 @@ public class R2Jesu_MoveUpCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public R2Jesu_MoveUpCommand(R2Jesu_ClimberSubsystem subsystem) {
-        m_subsystem = subsystem;
+    public R2Jesu_MoveUpCommand(R2Jesu_ClimberSubsystem subsystemClimber, 
+                                R2Jesu_IntakeSubsystem subsystemIntake) {
+        m_climberSubsystem = subsystemClimber;
+        m_intakeSubsystem = subsystemIntake;
+        /*if (isIntakeRaised()) {
+        }
+        else {
+            raiseIntake();
+        }
+        */
         // Use addRequirements() here to declare subsystem dependencies for each subsytem used
-        addRequirements(subsystem);
+        addRequirements(m_climberSubsystem);
+        addRequirements(m_intakeSubsystem);
     }
 
 

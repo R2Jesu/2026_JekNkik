@@ -82,12 +82,13 @@ public class RobotContainer {
 
     private void registerAutoCommands(){
 
-  NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
-  NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
-  NamedCommands.registerCommand("score", Commands.print("Command to shoot preloaded balls"));
-  NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
-  NamedCommands.registerCommand("intake", new SequentialCommandGroup(Commands.print("Pull down intake"), Commands.waitSeconds(1), Commands.print("Drive forward for x seconds")));
-  NamedCommands.registerCommand("throw", Commands.print("Command to shoot preloaded balls x meters"));
+     NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
+     NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
+  NamedCommands.registerCommand("score", new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
+    joystick));
+     NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
+  NamedCommands.registerCommand("intake", new R2Jesu_LowerIntakeCommand(m_intakeSubsystem)); //Commands.waitSeconds(1), Commands.print("Drive forward for x seconds")));
+     NamedCommands.registerCommand("throw", Commands.print("Command to shoot preloaded balls x meters"));
 
     
   }
