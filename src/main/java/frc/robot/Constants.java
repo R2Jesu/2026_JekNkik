@@ -10,6 +10,7 @@ public class Constants {
     public static final int kAprilTagHeight = 41;
     public static String kLimelightName = "limelight";
     public static final double kTXTolerance = 4;
+    public static final double kDefaultShootSpeed = 0.75;
     public static final PathConstraints teleopConstraints = new PathConstraints(
         2.12, 1.8, 45, 75);
     public static final Pose2d kRightHang = new Pose2d(1.02, 4.69, Rotation2d.fromDegrees(180));
