@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static edu.wpi.first.units.Units.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -58,16 +60,15 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
    */
   
   private boolean m_isFinished = false;
-  private int m_stateMachine = 1;
   private double m_distanceToAprilTag = 0;
   private double m_angleToAprilTag = 0;
   private double m_currentRobotHeading = 0; 
   private double m_newAngleHeading = 0;
-  private int m_debounceCounter = 0;
-  private int m_debounceLimit = 0;
   private double m_limeLightToAprilTagVerticalDistance = (Constants.kAprilTagHeight - Constants.kLimelightHeight);
   private double m_verticalAngleToAprilTag = 0;
   private CommandXboxController m_joystick;
+  private double m_rotation;
+  private List<Double> goodTags = new ArrayList<>();
 
   PIDController pid = new PIDController(.01, 0.00, 0.00);
 
@@ -99,14 +100,12 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
  
     System.out.println("==========================");
     System.out.println("Command Operator: AimWithLimelight");
-   
-    //Initialize State Machine
-    m_stateMachine = 1;
-
-    m_debounceCounter = 0;
-    m_debounceLimit = 10;
-  
+    
     m_isFinished = false;
+    m_rotation = 0.0;
+
+    //Need to add more tags
+    goodTags.add(25.0);
 
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
 
@@ -122,34 +121,37 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
           m_newAngleHeading = m_angleToAprilTag + m_currentRobotHeading;
           m_verticalAngleToAprilTag = LimelightHelpers.getTY(Constants.kLimelightName);
           m_distanceToAprilTag = m_limeLightToAprilTagVerticalDistance / Math.tan(Math.toRadians(m_verticalAngleToAprilTag));
-        }
-
-        m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY()))
-            .withVelocityY(xLimiter.calculate(-m_joystick.getRightX()))
-            .withRotationalRate(-pid.calculate(m_drivetrain.getState().RawHeading.getDegrees(), m_newAngleHeading) * (1.5 * Math.PI)));
-        if (Math.abs(pid.getPositionError()) <= Constants.kTXTolerance) {
-          if (m_debounceCounter >= m_debounceLimit) {
-            m_stateMachine = m_stateMachine + 1;
-          } else {
-            m_debounceCounter++;
-          }
+          m_rotation = -pid.calculate(m_drivetrain.getState().RawHeading.getDegrees(), m_newAngleHeading) * (1.5 * Math.PI);
         }
         else {
-          m_debounceCounter = 0;
+          m_rotation = 0.0;
         }
-  }
 
+    //Here add if the tag value is not a hub tag also do not rotate
+    if (!(goodTags.contains(LimelightHelpers.getFiducialID(Constants.kLimelightName))))
+    {
+      m_rotation = 0.0;
+    }
+
+
+    m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY()))
+        .withVelocityY(xLimiter.calculate(-m_joystick.getRightX()))
+        .withRotationalRate(m_rotation));
+        
+    m_shooterSubsystem.runShooter(Constants.kDefaultShootSpeed);
+
+  }
+ 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("Command Operator ShooerModeShootWithPose: Finished");
-    System.out.println("==========================");
+    m_shooterSubsystem.runShooter(0);
+    LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .001);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .001);
     return m_isFinished;
   }
 }
