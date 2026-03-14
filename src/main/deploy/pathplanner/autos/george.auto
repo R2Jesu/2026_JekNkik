@@ -7,13 +7,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test_Path"
+            "pathName": "George_col"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_run"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "throw"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_HP"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score "
           }
         }
       ]
