@@ -135,7 +135,7 @@ public class RobotContainer {
             joystick));
         joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
-        joystick.button(1).onTrue(
+        joystick2.button(1).onTrue(
             new ConditionalCommand(
             AutoBuilder.pathfindToPose(Constants.kLeftHang, Constants.teleopConstraints),
             AutoBuilder.pathfindToPose(Constants.kRightHang, Constants.teleopConstraints),
@@ -143,8 +143,8 @@ public class RobotContainer {
             )
         );
 
-        joystick2.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
-        joystick2.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
+        joystick.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
+        joystick.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
 
     }
 
