@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
 /** An example command that uses an example subsystem. */
-public class R2Jesu_MoveUpCommand extends Command {
+public class R2Jesu_ClimbUpCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     private final R2Jesu_ClimberSubsystem m_subsystem;
 // Retracts the robot's arm.
@@ -21,7 +21,7 @@ public class R2Jesu_MoveUpCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public R2Jesu_MoveUpCommand(R2Jesu_ClimberSubsystem subsystem) {
+    public R2Jesu_ClimbUpCommand(R2Jesu_ClimberSubsystem subsystem) {
         m_subsystem = subsystem;
         // Use addRequirements() here to declare subsystem dependencies for each subsytem used
         addRequirements(subsystem);
@@ -31,6 +31,7 @@ public class R2Jesu_MoveUpCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        m_subsystem.climbUp();
     }
 
 

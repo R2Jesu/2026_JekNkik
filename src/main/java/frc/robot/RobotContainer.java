@@ -135,6 +135,7 @@ public class RobotContainer {
             joystick));
         joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
+//need to raise hand before moving to position.  raiseHand in climb subsystem
         joystick.button(1).onTrue(
             new ConditionalCommand(
             AutoBuilder.pathfindToPose(Constants.kLeftHang, Constants.teleopConstraints),
