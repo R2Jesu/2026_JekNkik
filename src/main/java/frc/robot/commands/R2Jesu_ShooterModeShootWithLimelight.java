@@ -69,6 +69,9 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private CommandXboxController m_joystick;
   private double m_rotation;
   private List<Double> goodTags = new ArrayList<>();
+  // Distance → RPM lookup table (meters → RPM)
+  private static final double[] kDistances = { 1.5, 2.5, 3.5, 4.5 };
+  private static final double[] kRpms      = { 3200, 3800, 4400, 5200 };
 
   PIDController pid = new PIDController(.01, 0.00, 0.00);
 
@@ -106,6 +109,11 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
 
     //Need to add more tags
     goodTags.add(25.0);
+    goodTags.add(26.0);
+    goodTags.add(18.0);
+    goodTags.add(21.0);
+    goodTags.add(24.0);
+    goodTags.add(27.0);
 
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
 
@@ -138,7 +146,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
         .withVelocityY(xLimiter.calculate(-m_joystick.getRightX()))
         .withRotationalRate(m_rotation));
         
-    m_shooterSubsystem.runShooter(Constants.kDefaultShootSpeed);
+    m_shooterSubsystem.runShooter(rpmForDistance());
 
   }
  
@@ -153,5 +161,21 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   @Override
   public boolean isFinished() {
     return m_isFinished;
+  }
+
+  private double rpmForDistance() {
+    double dMeters = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName).avgTagDist;
+    if (dMeters <= kDistances[0]) return kRpms[0];
+    if (dMeters >= kDistances[kDistances.length - 1]) return kRpms[kRpms.length - 1];
+    for (int i = 0; i < kDistances.length - 1; i++) {
+        double d0 = kDistances[i];
+        double d1 = kDistances[i + 1];
+        if (dMeters >= d0 && dMeters <= d1) {
+            double t = (dMeters - d0) / (d1 - d0);
+            return kRpms[i] + t * (kRpms[i + 1] - kRpms[i]);
+        }
+    }
+    //return kRpms[0]; commented for testing
+    return 1500;
   }
 }
