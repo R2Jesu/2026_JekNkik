@@ -39,12 +39,6 @@
           "data": {
             "name": "intake"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "throw"
-          }
         }
       ]
     }
