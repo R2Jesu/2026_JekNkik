@@ -77,18 +77,18 @@ public class RobotContainer {
         
         // MEE ADDED Warmup PathPlanner to avoid Java pauses
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
-        System.out.print(MaxSpeed);
 
     }
 
     private void registerAutoCommands(){
 
-  NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
-  NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
-  NamedCommands.registerCommand("score", Commands.print("Command to shoot preloaded balls"));
-  NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
-  NamedCommands.registerCommand("intake", new SequentialCommandGroup(Commands.print("Pull down intake"), Commands.waitSeconds(1), Commands.print("Drive forward for x seconds")));
-  NamedCommands.registerCommand("throw", Commands.print("Command to shoot preloaded balls x meters"));
+     NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
+     NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
+  NamedCommands.registerCommand("score", new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
+    joystick));
+     NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
+  NamedCommands.registerCommand("intake", new R2Jesu_LowerIntakeCommand(m_intakeSubsystem)); //Commands.waitSeconds(1), Commands.print("Drive forward for x seconds")));
+     NamedCommands.registerCommand("throw", Commands.print("Command to shoot preloaded balls x meters"));
 
     
   }
@@ -99,13 +99,10 @@ public class RobotContainer {
         m_robotDrive.setDefaultCommand(
             // m_robotDrive will execute this command periodically
             m_robotDrive.applyRequest(() ->
-                // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
-                // Apply slew limiters in real-world units (m/s and rad/s) so their
-                // configured limits are meaningful.
-                drive.withVelocityX(yLimiter.calculate(-joystick.getRightY() * MaxSpeed)) // Drive forward with negative Y (forward)
-                     .withVelocityY(xLimiter.calculate(-joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
-                    //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-                    .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(yLimiter.calculate(-joystick.getRightY())) // Drive forward with negative Y (forward)
+                    .withVelocityY(xLimiter.calculate(-joystick.getRightX())) // Drive left with negative X (left)
+                    //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX())) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-joystick.getLeftX()) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -139,7 +136,7 @@ public class RobotContainer {
             joystick));
         joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
-        joystick2.button(1).onTrue(
+        joystick.button(1).onTrue(
             new ConditionalCommand(
             AutoBuilder.pathfindToPose(Constants.kLeftHang, Constants.teleopConstraints),
             AutoBuilder.pathfindToPose(Constants.kRightHang, Constants.teleopConstraints),
@@ -147,8 +144,8 @@ public class RobotContainer {
             )
         );
 
-        joystick.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
-        joystick.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
+        joystick2.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
+        joystick2.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
 
     }
 
