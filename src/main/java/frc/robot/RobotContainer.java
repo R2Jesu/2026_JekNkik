@@ -77,6 +77,7 @@ public class RobotContainer {
         
         // MEE ADDED Warmup PathPlanner to avoid Java pauses
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+        System.out.print(MaxSpeed);
 
     }
 
@@ -98,10 +99,13 @@ public class RobotContainer {
         m_robotDrive.setDefaultCommand(
             // m_robotDrive will execute this command periodically
             m_robotDrive.applyRequest(() ->
-                drive.withVelocityX(yLimiter.calculate(-joystick.getRightY())) // Drive forward with negative Y (forward)
-                    .withVelocityY(xLimiter.calculate(-joystick.getRightX())) // Drive left with negative X (left)
-                    //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX())) // Drive counterclockwise with negative X (left)
-                    .withRotationalRate(-joystick.getLeftX()) // Drive counterclockwise with negative X (left)
+                // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
+                // Apply slew limiters in real-world units (m/s and rad/s) so their
+                // configured limits are meaningful.
+                drive.withVelocityX(yLimiter.calculate(-joystick.getRightY() * MaxSpeed)) // Drive forward with negative Y (forward)
+                     .withVelocityY(xLimiter.calculate(-joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
+                    //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
             )
         );
 

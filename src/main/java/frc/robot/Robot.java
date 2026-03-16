@@ -21,6 +21,9 @@ import frc.robot.utilities.LimelightHelpers;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard; 
 //import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import java.util.Optional;
 
 
 public class Robot extends TimedRobot {
@@ -38,6 +41,7 @@ public class Robot extends TimedRobot {
 // R2JESU 
   private final Field2d ourfield = new Field2d(); //R2JESU
   double omegaRPS; //R2JESU
+  Optional<Alliance> alliance = DriverStation.getAlliance();
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -54,6 +58,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     SmartDashboard.putData("Field", ourfield);
     m_robotContainer.m_robotDrive.getPigeon2().reset();
+        if (alliance.get() == Alliance.Red) {
+        m_robotContainer.m_robotDrive.getPigeon2().setYaw(180.0);
+    }
+    else {
+        m_robotContainer.m_robotDrive.getPigeon2().setYaw(0.0);
+    }
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 1);
     SmartDashboard.putData("Swerve Drive", new Sendable() {
@@ -106,7 +116,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putString("Choice", m_autonomousCommand.toString());
     //SmartDashboard.putNumber("Tag Count", myLimelightPose.tagCount);
-    //SmartDashboard.putNumber("Pigeonyaw", m_robotContainer.m_robotDrive.getState().RawHeading.getDegrees());
+    SmartDashboard.putNumber("Pigeonyaw", m_robotContainer.m_robotDrive.getState().RawHeading.getDegrees());
     SmartDashboard.putNumber("pigeon2 yaw", Math.floorMod((int) getPigeon().getYaw().getValueAsDouble(), 360));
     //SmartDashboard.putNumber("Distance", distance);
     //SmartDashboard.putNumber("omegaRPS", Math.abs(omegaRPS));
