@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -38,10 +39,10 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
 
     shooterConfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(.0002)
-    .i(0.0)
-    .d(0.0)
-    .outputRange(-1, 1);
+    .p(.001)
+    .i(0.0000007)
+    .d(0.00001)
+    .outputRange(0, 1);
 
     shooterMotor.configure(shooterConfig, 
     ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -58,7 +59,7 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          shooterController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+          //shooterController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
           /* one-time action goes here */
         });
   }
@@ -72,6 +73,7 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
     } else {
       kickerbarMotor.set(0.0);
     }
+    SmartDashboard.putNumber("Subsystem shoot speed", speed);
   }
 
  

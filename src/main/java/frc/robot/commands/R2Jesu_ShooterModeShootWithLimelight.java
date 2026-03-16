@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.utilities.LimelightHelpers;
+import frc.robot.utilities.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
@@ -15,12 +16,17 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import static edu.wpi.first.units.Units.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 
@@ -70,8 +76,11 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private double m_rotation;
   private List<Double> goodTags = new ArrayList<>();
   // Distance → RPM lookup table (meters → RPM)
-  private static final double[] kDistances = { 1.5, 2.5, 3.5, 4.5 };
-  private static final double[] kRpms      = { 3200, 3800, 4400, 5200 };
+  private static final double[] kDistances = { 1.5, 2.0, 2.25, 2.5, 3.0, 3.5, 4.0 };
+  private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
+
+  Optional<Alliance> alliance = DriverStation.getAlliance();
+  private PoseEstimate pose;
 
   PIDController pid = new PIDController(.01, 0.00, 0.00);
 
@@ -114,6 +123,8 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     goodTags.add(21.0);
     goodTags.add(24.0);
     goodTags.add(27.0);
+    goodTags.add(9.0);
+    goodTags.add(10.0);
 
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
 
@@ -142,9 +153,12 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     }
 
 
-    m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY()))
-        .withVelocityY(xLimiter.calculate(-m_joystick.getRightX()))
-        .withRotationalRate(m_rotation));
+  // Scale joystick inputs to meters/sec so the drivetrain sees real-world speeds
+  // (TunerConstants.kSpeedAt12Volts is the theoretical max speed at 12V)
+  double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+  m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY() * maxSpeed))
+    .withVelocityY(xLimiter.calculate(-m_joystick.getRightX() * maxSpeed))
+    .withRotationalRate(m_rotation));
         
     m_shooterSubsystem.runShooter(rpmForDistance());
 
@@ -164,7 +178,20 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   }
 
   private double rpmForDistance() {
-    double dMeters = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName).avgTagDist;
+
+    //if (alliance.get() == Alliance.Red) {
+    //    pose = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(Constants.kLimelightName);
+    //}
+    //else {
+        pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
+    //}
+    if (pose == null) {
+      // Limelight didn't return a pose estimate; fall back to a safe default RPM
+      SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);
+      return 1500;
+    }
+    double dMeters = pose.avgTagDist;
+    SmartDashboard.putNumber("dmeter", dMeters);
     if (dMeters <= kDistances[0]) return kRpms[0];
     if (dMeters >= kDistances[kDistances.length - 1]) return kRpms[kRpms.length - 1];
     for (int i = 0; i < kDistances.length - 1; i++) {
@@ -172,10 +199,12 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
         double d1 = kDistances[i + 1];
         if (dMeters >= d0 && dMeters <= d1) {
             double t = (dMeters - d0) / (d1 - d0);
+            SmartDashboard.putNumber("Shoot RPM2", kRpms[0]);
             return kRpms[i] + t * (kRpms[i + 1] - kRpms[i]);
         }
     }
-    //return kRpms[0]; commented for testing
-    return 1500;
+    SmartDashboard.putNumber("Shoot RPM3", kRpms[0]);
+    return kRpms[0];
+    //return 1500;
   }
 }
