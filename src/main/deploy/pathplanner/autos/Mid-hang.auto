@@ -39,18 +39,6 @@
           "data": {
             "name": "intake"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid_run"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "throw"
-          }
         }
       ]
     }
