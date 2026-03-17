@@ -25,7 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intake"
+            "name": "lower_intake"
           }
         },
         {

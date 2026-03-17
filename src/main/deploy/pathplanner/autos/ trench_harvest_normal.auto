@@ -5,51 +5,51 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Depot_shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "score"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "go_balls_Depot"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "lower_intake"
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Depot_shoot_2"
+            "pathName": "George_col"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_run"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "throw"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_HP"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "George_shoot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "score "
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "hang_depot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "hang"
           }
         }
       ]
