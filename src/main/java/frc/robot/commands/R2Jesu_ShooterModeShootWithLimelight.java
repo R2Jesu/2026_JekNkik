@@ -14,8 +14,11 @@ import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
+import java.lang.Math;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -78,6 +81,18 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   // Distance → RPM lookup table (meters → RPM)
   private static final double[] kDistances = { 1.5, 2.0, 2.25, 2.5, 3.0, 3.5, 4.0 };
   private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
+  // default speed to return if none can be calculated
+  private double m_defaultVelocity = 1500;
+  // Distance -> RPM Calculation Variables
+  private double m_xLaunchDistance = 0; //Horizontal distance from the release point to the center of the hoop.
+  private double m_yLaunchHeight = (72-11.5)*0.0254; // meters-Vertical distance (height difference) between the release point 11.5" and the hoop(72"), constant
+  private double m_hoopRadius = 20.585*0.0254; // meters-radius of the target, defined constant 41.17/2
+  private double m_gAccelGravity = 9.81; //Acceleration due to gravity approximation m/s2, constant
+  private double m_launcherSetback= 9.5*0.0254; // distance in meters that the shooter is set back from the limelight ?5"?
+  private double m_tLaunchAngle = Math.toRadians(68.9); // Launch angle relative to the horizontal in degrees, constant
+  private double m_numerator = 0;
+  private double m_denominator = 0;
+  private double m_kRpmsCalc = 0;
 
   Optional<Alliance> alliance = DriverStation.getAlliance();
   private PoseEstimate pose;
@@ -179,19 +194,46 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
 
   private double rpmForDistance() {
 
-    //if (alliance.get() == Alliance.Red) {
-    //    pose = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(Constants.kLimelightName);
-    //}
-    //else {
-        pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
-    //}
+    pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
     if (pose == null) {
       // Limelight didn't return a pose estimate; fall back to a safe default RPM
-      SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);
-      return 1500;
+      SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);  // what is this printing out if we are returning default velocity?
+      return m_defaultVelocity; // default velocity to return set in variable section
     }
     double dMeters = pose.avgTagDist;
     SmartDashboard.putNumber("dmeter", dMeters);
+
+// Calculate velocity based on projectile motion equation - return statements commented out during testing
+      boolean m_impossibleShot = false;
+
+    //limelight distance plus radius of hoop and setback of launcher from 
+    m_xLaunchDistance = dMeters + m_launcherSetback + m_hoopRadius; 
+
+    // g*Xsquared  acceleration gravity * distance to center of target squared
+    m_numerator=m_gAccelGravity*Math.pow(m_xLaunchDistance,2); // g*xsquared measured in meters
+    SmartDashboard.putNumber("numerator", m_numerator);
+
+    //2*cos squared(theta)(x tan(theta)-y measured in radians
+    m_denominator=2*Math.pow(Math.cos(m_tLaunchAngle),2)*(m_xLaunchDistance*Math.tan(m_tLaunchAngle)-m_yLaunchHeight); 
+    SmartDashboard.putNumber("denominator", m_denominator);
+
+    // make sure shot is physically possible, if not ... do ??? nothing ??? LED light???
+    if(m_denominator<=0) {
+      m_impossibleShot=true;
+      SmartDashboard.putNumber("kRpms Calc",m_defaultVelocity);      
+      //return 0; //set status light
+    }
+    else {
+      // this is in m/s - need to convert m/s to rpm by ???velocityMps / 2 * Math.PI * wheelRadiusMeters)*GearRatio
+      // m/s is 251 RPM
+
+      m_kRpmsCalc=(Math.sqrt(m_numerator/m_denominator)*251); 
+      double m_maxVelocity=5000.0; // max velocity for motor, if number is greater than this only send the max
+      SmartDashboard.putNumber("kRpms Calc", MathUtil.clamp(m_kRpmsCalc,0.0,m_maxVelocity));      
+      //return MathUtil.clamp(m_kRpmsCalc,0.0,m_maxVelocity); // prevents sending impossible value to motors
+     }
+
+// Calculate velocity based on fixed array of velocity/distance pairs
     if (dMeters <= kDistances[0]) return kRpms[0];
     if (dMeters >= kDistances[kDistances.length - 1]) return kRpms[kRpms.length - 1];
     for (int i = 0; i < kDistances.length - 1; i++) {
@@ -204,7 +246,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
         }
     }
     SmartDashboard.putNumber("Shoot RPM3", kRpms[0]);
+
     return kRpms[0];
-    //return 1500;
   }
 }

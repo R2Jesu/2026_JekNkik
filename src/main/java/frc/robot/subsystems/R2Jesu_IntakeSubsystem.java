@@ -67,7 +67,7 @@ public class R2Jesu_IntakeSubsystem extends SubsystemBase {
     .p(.0002)
     .i(0.0)
     .d(0.0)
-    .outputRange(-1, 1);
+    .outputRange(0, 1);
 
     intake_wheelsMotor.configure(wheelsConfig, 
     ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);

@@ -29,14 +29,12 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
   private final R2Jesu_IntakeSubsystem m_intakeSubsystem;
  
   private SparkMax climbMotor = new SparkMax(55, MotorType.kBrushless);
- // private Encoder climbEncoder = new Encoder(0,1, true, CounterBase.EncodingType.k4X);
   private static int targetPosition=0;
-  private double climbPositions[] = {5000.0, 0.0, 4000.0}; //raise hand, climb up, climb down
+  private double climbPositions[] = {5000.0, 0.0, 4000.0, 5000.0}; //raise hand, climb up, climb down, retract hand
   private PIDController m_climbUpController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
   private PIDController m_climbDownController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
-  private double up_pidOutput;
-  private double down_pidOutput;
-  private double raise_pidOutput;
+  private PIDController m_noWeightController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
+  private double pidOutput;
   private PWMConfigDataResult myResult; //no idea
 
    // Get the internal encoder object from the motor controller
@@ -62,14 +60,6 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
         });
   }
 
-/*   public void runClimber(double speed) {
-          //if the intake is down, raise it before climbing
-          if(!(m_intakeSubsystem.isIntakeRaised())){
-            m_intakeSubsystem.raiseIntake();
-          }    
-  } 
- */
-
 // moves the climber at designated speed, called from periodic until meets target
 
   public void moveClimber(double speed) {
@@ -82,44 +72,40 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
       if(!(m_intakeSubsystem.isIntakeRaised())){
         m_intakeSubsystem.raiseIntake();
        }
-      climbMotor.set(.1);      
   }
 
   // lower the robot back down to the floor, hand all the way up
    public void climbDown() {
       targetPosition=2;
-      climbMotor.set(.5);
   } 
 
 // Pull the arm down to raise the robot off the floor, hand all the way retracted
   public void climbUp() {
       targetPosition=1;
-      climbMotor.set(.5);
   }  
 
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //SmartDashboard.putNumber("encoderdistance", hangerEncoder.getDistance());
     SmartDashboard.putNumber("Climbdistance", climbEncoder.getPosition());
-    down_pidOutput = m_climbUpController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
-    up_pidOutput = m_climbDownController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]); 
-    raise_pidOutput = m_climbDownController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]); 
-
-    if (targetPosition ==0)
+    if (targetPosition ==0) // assigned in raise hand
     {
-        this.moveClimber(raise_pidOutput);
+        pidOutput = m_noWeightController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
     }    
-    else if (targetPosition ==1)
+    else if (targetPosition ==1) // assigned in climb up
     {
-      this.moveClimber(up_pidOutput);
+      pidOutput = m_climbUpController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
     } 
-   else if (targetPosition ==2)
+   else if (targetPosition ==2) // assigned in climb down
     {
-      this.moveClimber(down_pidOutput);
+      pidOutput = m_climbDownController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
+    }  
+   else if (targetPosition ==3) // assigned in retract hand
+    {
+      pidOutput = m_noWeightController.calculate(climbEncoder.getPosition(),-climbPositions[targetPosition]);
     } 
-   
+     this.moveClimber(pidOutput);
   }
 
   @Override
