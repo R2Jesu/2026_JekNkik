@@ -17,15 +17,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "go_balls_HP"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "lower_intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "go_balls_HP"
           }
         },
         {
