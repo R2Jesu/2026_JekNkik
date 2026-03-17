@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -87,9 +88,11 @@ public class RobotContainer {
   NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
   NamedCommands.registerCommand("score", new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
   NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
-  NamedCommands.registerCommand("intake", new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
-  NamedCommands.registerCommand("throw", Commands.print("Command to shoot preloaded balls x meters"));
+  NamedCommands.registerCommand("lower_intake", new SequentialCommandGroup (new R2Jesu_LowerIntakeCommand(m_intakeSubsystem)));
+  NamedCommands.registerCommand("throw", new R2Jesu_ThrowCommand(m_shooterSubsystem));
   NamedCommands.registerCommand("moveitmoveit", AutoBuilder.pathfindToPose(Constants.moveit, Constants.teleopConstraints));
+ // NamedCommands.registerCommand("score", Commands.print("throw ball into hoop"));
+  //NamedCommands.registerCommand("throw", Commands.print("shoot over to our side"));
     
   }
 

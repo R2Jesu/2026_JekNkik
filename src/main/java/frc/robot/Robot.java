@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Optional;
-
+import edu.wpi.first.cameraserver.CameraServer; 
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     
  @Override //PHX6ex DOESN'T HAVE A ROBOT INIT?
   public void robotInit() {
+    //CameraServer.startAutomaticCapture();
     SmartDashboard.putData("Field", ourfield);
     m_robotContainer.m_robotDrive.getPigeon2().reset();
         if (alliance.get() == Alliance.Red) {

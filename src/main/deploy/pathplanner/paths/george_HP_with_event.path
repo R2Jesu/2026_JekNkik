@@ -47,7 +47,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "throw",
+      "waypointRelativePos": 1.043869516310454,
+      "endWaypointRelativePos": 0,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.12,
     "maxAcceleration": 1.8,

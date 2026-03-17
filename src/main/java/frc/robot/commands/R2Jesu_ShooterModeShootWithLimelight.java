@@ -171,6 +171,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    System.out.println("shooter interrupted");
     m_shooterSubsystem.runShooter(0);
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .001);
   }
