@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.560328102710413,
-        "y": 6.92679029957204
+        "x": 3.5473894436519258,
+        "y": 4.07798578199052
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2087283911970235,
-        "y": 6.698173415013859
+        "x": 1.254,
+        "y": 3.3971818181818194
       },
-      "isLocked": false,
-      "linkedName": null
+      "isLocked": true,
+      "linkedName": "b_mid_depot"
     },
     {
       "anchor": {
-        "x": 2.2432236842105255,
-        "y": 6.033980263157895
+        "x": 1.7921590909090912,
+        "y": 7.2440227272727284
       },
       "prevControl": {
-        "x": 2.454267588976797,
-        "y": 6.176754746120138
+        "x": 1.8916797640049507,
+        "y": 7.014685343432791
       },
       "nextControl": null,
-      "isLocked": false,
-      "linkedName": "E_shoot_depot"
+      "isLocked": true,
+      "linkedName": "E_mid_dep"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7779751332149232,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -41,8 +46,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.0,
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,

@@ -142,6 +142,8 @@ public class RobotContainer {
         //R2JESU Driver Buttons and such
         joystick.rightTrigger().whileTrue(new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
             joystick));
+        joystick.leftTrigger().whileTrue(new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
+            joystick));
         joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
         joystick2.button(1).onTrue(

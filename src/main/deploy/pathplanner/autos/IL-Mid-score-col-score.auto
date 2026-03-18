@@ -5,58 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "middle_shoot"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "lower_intake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.1
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "George_col"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "George_run"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "throw"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "George_HP"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "George_shoot"
           }
         },
         {
@@ -66,7 +23,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 8.0
+                  "waitTime": 6.0
                 }
               },
               {
@@ -76,6 +33,30 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot_depot_intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot_intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot_sweep_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreit"
           }
         }
       ]

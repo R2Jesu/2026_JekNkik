@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.560328102710413,
-        "y": 6.92679029957204
+        "x": 4.579596678529064,
+        "y": 0.6404744958481603
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2087283911970235,
-        "y": 6.698173415013859
+        "x": 3.5795966785290636,
+        "y": 0.6404744958481604
+      },
+      "isLocked": false,
+      "linkedName": "g_run_end"
+    },
+    {
+      "anchor": {
+        "x": 2.858233333333333,
+        "y": 0.6404744958481603
+      },
+      "prevControl": {
+        "x": 3.4262901515151514,
+        "y": 0.6266590909090928
+      },
+      "nextControl": {
+        "x": 2.3576006357191144,
+        "y": 0.6526501149445311
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.2432236842105255,
-        "y": 6.033980263157895
+        "x": 2.8,
+        "y": 2.17061111111111
       },
       "prevControl": {
-        "x": 2.454267588976797,
-        "y": 6.176754746120138
+        "x": 1.7999999999999998,
+        "y": 2.1706111111111097
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "E_shoot_depot"
+      "linkedName": "e_george_shoot"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 47.54480437981308
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

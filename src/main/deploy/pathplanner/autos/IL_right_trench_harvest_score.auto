@@ -13,7 +13,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.1
+            "waitTime": 1.0
           }
         },
         {
@@ -23,40 +23,15 @@
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "George_run"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "throw"
-                }
-              }
-            ]
+            "pathName": "George_run"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_HP"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "George_shoot"
+            "pathName": "George_run_shoot"
           }
         },
         {

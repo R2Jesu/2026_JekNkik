@@ -13,50 +13,25 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.1
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_col"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "George_run"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "throw"
-                }
-              }
-            ]
+            "pathName": "Left_George_col"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_HP"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
+            "pathName": "Left_George_run"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_shoot"
+            "pathName": "Left_George_run_shoot"
           }
         },
         {
