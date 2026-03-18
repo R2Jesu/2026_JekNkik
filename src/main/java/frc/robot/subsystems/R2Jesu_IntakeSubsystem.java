@@ -40,7 +40,7 @@ public class R2Jesu_IntakeSubsystem extends SubsystemBase {
   private final SparkClosedLoopController intake_wheelController = intake_wheelsMotor.getClosedLoopController();
   // feed-forward for wheel velocity controller
   // default wheel RPM to use when lowering intake (change to your robot's target)
-  private static final double intake_lower_wheel_rpm = 4200.0;
+  private static final double intake_lower_wheel_rpm = 3735.28;
   // Shuffleboard entry for a number slider to let user change intake RPM (0-9000)
   private GenericEntry intakeRpmEntry;
  // added to use closed loop controller

@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import com.revrobotics.spark.config.SparkMaxConfig;
 import java.lang.management.ClassLoadingMXBean;
 
 import com.revrobotics.spark.SparkMax;
@@ -19,8 +19,11 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.revrobotics.PersistMode;
 //import frc.robot.subsystems.R2Jesu_IntakeSubsystem;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 
 
 
@@ -30,7 +33,7 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
  
   private SparkMax climbMotor = new SparkMax(55, MotorType.kBrushless);
   private static int targetPosition=0;
-  private double climbPositions[] = {5000.0, 0.0, 4000.0, 5000.0}; //raise hand, climb up, climb down, retract hand
+  private double climbPositions[] = {-300.0, 0.0, 4000.0, 5000.0}; //raise hand, climb up, climb down, retract hand
   private PIDController m_climbUpController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
   private PIDController m_climbDownController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
   private PIDController m_noWeightController = new PIDController(.00025, 0.0, 0.0, 0.01); //p 1.5
@@ -39,12 +42,16 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
 
    // Get the internal encoder object from the motor controller
   private final RelativeEncoder climbEncoder = climbMotor.getEncoder();
+  private SparkMaxConfig climbConfig=new SparkMaxConfig();
 
   /** Creates a new R2Jesu_ClimberSubsystem. */
 
   public R2Jesu_ClimberSubsystem(R2Jesu_IntakeSubsystem intake) {
     // Query some boolean state, such as a digital sensor.
     this.m_intakeSubsystem = intake;
+    climbConfig.smartCurrentLimit(20);
+    climbMotor.configure(climbConfig, 
+    ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   /**
@@ -63,7 +70,7 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
 // moves the climber at designated speed, called from periodic until meets target
 
   public void moveClimber(double speed) {
-            climbMotor.set(speed);
+            climbMotor.set(.5);
   } 
 
   // put hand in the air and raise intake if needed before moving into position to climb, hand all the way up
@@ -91,11 +98,11 @@ public class R2Jesu_ClimberSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Climbdistance", climbEncoder.getPosition());
     if (targetPosition ==0) // assigned in raise hand
     {
-        pidOutput = m_noWeightController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
+        pidOutput = -m_noWeightController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
     }    
     else if (targetPosition ==1) // assigned in climb up
     {
-      pidOutput = m_climbUpController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
+      pidOutput = -m_climbUpController.calculate(climbEncoder.getPosition(),climbPositions[targetPosition]);
     } 
    else if (targetPosition ==2) // assigned in climb down
     {

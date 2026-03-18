@@ -80,13 +80,14 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private List<Double> goodTags = new ArrayList<>();
   // Distance → RPM lookup table (meters → RPM)
   private static final double[] kDistances = { 1.5, 2.0, 2.25, 2.5, 3.0, 3.5, 4.0 };
-  private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
+ // private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
+  private static final double[] kRpms      = { 750, 4000, 4250, 2040, 2040, 800, 5500 };
   // default speed to return if none can be calculated
   private double m_defaultVelocity = 1500;
   // Distance -> RPM Calculation Variables
   private double m_xLaunchDistance = 0; //Horizontal distance from the release point to the center of the hoop.
   private double m_yLaunchHeight = (72-11.5)*0.0254; // meters-Vertical distance (height difference) between the release point 11.5" and the hoop(72"), constant
-  private double m_hoopRadius = 20.585*0.0254; // meters-radius of the target, defined constant 41.17/2
+  private double m_hoopRadius = 23.5*0.0254; // meters-radius of the target, defined constant 41.17/2
   private double m_gAccelGravity = 9.81; //Acceleration due to gravity approximation m/s2, constant
   private double m_launcherSetback= 9.5*0.0254; // distance in meters that the shooter is set back from the limelight ?5"?
   private double m_tLaunchAngle = Math.toRadians(68.9); // Launch angle relative to the horizontal in degrees, constant
@@ -146,6 +147,8 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     goodTags.add(2.0);
 
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
+ //   double dMeters = pose.avgTagDist + m_hoopRadius + m_launcherSetback;
+   // SmartDashboard.putNumber("dmeter", dMeters);
 
   }
 
@@ -200,19 +203,21 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private double rpmForDistance() {
 
     pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
-    if (pose == null) {
+    boolean m_shotpossible = true;
+    SmartDashboard.putBoolean("ShotPossible", m_shotpossible);
+        if (pose == null) {
       // Limelight didn't return a pose estimate; fall back to a safe default RPM
+      m_shotpossible = false;
       SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);  // what is this printing out if we are returning default velocity?
       return m_defaultVelocity; // default velocity to return set in variable section
     }
-    double dMeters = pose.avgTagDist;
+// avgTagDist is off by 1-4 inches; suspect angles are the problem
+    double dMeters = pose.avgTagDist; 
     SmartDashboard.putNumber("dmeter", dMeters);
-
-// Calculate velocity based on projectile motion equation - return statements commented out during testing
-      boolean m_impossibleShot = false;
-
+    // Calculate velocity based on projectile motion equation
     //limelight distance plus radius of hoop and setback of launcher from 
-    m_xLaunchDistance = dMeters + m_launcherSetback + m_hoopRadius; 
+    m_xLaunchDistance = dMeters+ m_hoopRadius + m_launcherSetback;    
+    SmartDashboard.putNumber("distance", m_xLaunchDistance);
 
     // g*Xsquared  acceleration gravity * distance to center of target squared
     m_numerator=m_gAccelGravity*Math.pow(m_xLaunchDistance,2); // g*xsquared measured in meters
@@ -223,22 +228,25 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     SmartDashboard.putNumber("denominator", m_denominator);
 
     // make sure shot is physically possible, if not ... do ??? nothing ??? LED light???
-    if(m_denominator<=0) {
-      m_impossibleShot=true;
-      SmartDashboard.putNumber("kRpms Calc",m_defaultVelocity);      
-      //return 0; //set status light
+      if(m_denominator<=0) {
+      m_shotpossible=false;
+      SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
+      return 0; //set status light
     }
     else {
       // this is in m/s - need to convert m/s to rpm by ???velocityMps / 2 * Math.PI * wheelRadiusMeters)*GearRatio
       // m/s is 251 RPM
-
-      m_kRpmsCalc=(Math.sqrt(m_numerator/m_denominator)*251); 
+      m_shotpossible=true;
+      double m_factor = 2.2; //multiplier for basketball-fuel conversion
+      SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
+      m_kRpmsCalc=(Math.sqrt(m_numerator/m_denominator)*187.97);
       double m_maxVelocity=5000.0; // max velocity for motor, if number is greater than this only send the max
-      SmartDashboard.putNumber("kRpms Calc", MathUtil.clamp(m_kRpmsCalc,0.0,m_maxVelocity));      
-      //return MathUtil.clamp(m_kRpmsCalc,0.0,m_maxVelocity); // prevents sending impossible value to motors
+      SmartDashboard.putNumber("kRpms Calc", MathUtil.clamp(m_kRpmsCalc*m_factor,0.0,m_maxVelocity));      
+      return MathUtil.clamp(m_kRpmsCalc*m_factor,0.0,m_maxVelocity); // prevents sending impossible value to motors
      }
-
+/* 
 // Calculate velocity based on fixed array of velocity/distance pairs
+    double m_return;
     if (dMeters <= kDistances[0]) return kRpms[0];
     if (dMeters >= kDistances[kDistances.length - 1]) return kRpms[kRpms.length - 1];
     for (int i = 0; i < kDistances.length - 1; i++) {
@@ -246,12 +254,15 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
         double d1 = kDistances[i + 1];
         if (dMeters >= d0 && dMeters <= d1) {
             double t = (dMeters - d0) / (d1 - d0);
-            SmartDashboard.putNumber("Shoot RPM2", kRpms[0]);
-            return kRpms[i] + t * (kRpms[i + 1] - kRpms[i]);
+            m_return =kRpms[i] + t * (kRpms[i + 1] - kRpms[i]);
+            SmartDashboard.putNumber("Shoot RPM2",  m_return);
+//            return kRpms[i] + t * (kRpms[i + 1] - kRpms[i]);
+      SmartDashboard.putNumber("hardcoded velocity", MathUtil.clamp(m_kRpmsCalc,0.0,6000));      
+      return MathUtil.clamp(m_kRpmsCalc*1.45,0.0,6000); // prevents sending impossible value to motors
         }
     }
     SmartDashboard.putNumber("Shoot RPM3", kRpms[0]);
 
     return kRpms[0];
-  }
+ */  }
 }

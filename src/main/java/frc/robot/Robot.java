@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
     
  @Override //PHX6ex DOESN'T HAVE A ROBOT INIT?
   public void robotInit() {
-    //CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture();
     SmartDashboard.putData("Field", ourfield);
     m_robotContainer.m_robotDrive.getPigeon2().reset();
         if (alliance.get() == Alliance.Red) {
