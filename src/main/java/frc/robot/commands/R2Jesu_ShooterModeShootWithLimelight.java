@@ -228,7 +228,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     SmartDashboard.putNumber("denominator", m_denominator);
 
     // make sure shot is physically possible, if not ... do ??? nothing ??? LED light???
-    if(m_denominator<=0) {
+      if(m_denominator<=0) {
       m_shotpossible=false;
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
       return 0; //set status light
@@ -237,7 +237,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
       // this is in m/s - need to convert m/s to rpm by ???velocityMps / 2 * Math.PI * wheelRadiusMeters)*GearRatio
       // m/s is 251 RPM
       m_shotpossible=true;
-      double m_factor = 2.25; //multiplier for basketball-fuel conversion
+      double m_factor = 2.2; //multiplier for basketball-fuel conversion
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
       m_kRpmsCalc=(Math.sqrt(m_numerator/m_denominator)*187.97);
       double m_maxVelocity=5000.0; // max velocity for motor, if number is greater than this only send the max
