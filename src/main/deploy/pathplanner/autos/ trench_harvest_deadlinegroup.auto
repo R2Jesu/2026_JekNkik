@@ -13,7 +13,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.1
           }
         },
         {
@@ -23,19 +23,13 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "George_run"
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 5.0
+                  "pathName": "George_run"
                 }
               },
               {
@@ -60,9 +54,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "score "
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "scoreit"
+                }
+              }
+            ]
           }
         }
       ]
