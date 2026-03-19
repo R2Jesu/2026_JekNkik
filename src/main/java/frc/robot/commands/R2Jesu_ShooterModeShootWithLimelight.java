@@ -78,6 +78,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private CommandXboxController m_joystick;
   private double m_rotation;
   private List<Double> goodTags = new ArrayList<>();
+  private List<Double> adjTags = new ArrayList<>();
   // Distance → RPM lookup table (meters → RPM)
   private static final double[] kDistances = { 1.5, 2.0, 2.25, 2.5, 3.0, 3.5, 4.0 };
  // private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
@@ -146,6 +147,11 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     goodTags.add(5.0);
     goodTags.add(2.0);
 
+    adjTags.add(9.0);
+    adjTags.add(10.0);
+    adjTags.add(25.0);
+    adjTags.add(26.0);
+
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
  //   double dMeters = pose.avgTagDist + m_hoopRadius + m_launcherSetback;
    // SmartDashboard.putNumber("dmeter", dMeters);
@@ -160,6 +166,11 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
           m_angleToAprilTag = LimelightHelpers.getTX(Constants.kLimelightName);
           m_currentRobotHeading = m_drivetrain.getState().RawHeading.getDegrees();
           m_newAngleHeading = m_angleToAprilTag + m_currentRobotHeading;
+          //If we are looking at the offset tags and from the right take a margin off the ajustment to keep it more centered
+          //Need to check that a positive angle to tag is correct but I think it all runs counterclockwise.  Need to verify.
+          if ( adjTags.contains(LimelightHelpers.getFiducialID(Constants.kLimelightName)) && m_angleToAprilTag > 0) {
+            m_newAngleHeading = m_newAngleHeading - 5.0;
+          }
           m_verticalAngleToAprilTag = LimelightHelpers.getTY(Constants.kLimelightName);
           m_distanceToAprilTag = m_limeLightToAprilTagVerticalDistance / Math.tan(Math.toRadians(m_verticalAngleToAprilTag));
           m_rotation = -pid.calculate(m_drivetrain.getState().RawHeading.getDegrees(), m_newAngleHeading) * (1.5 * Math.PI);
