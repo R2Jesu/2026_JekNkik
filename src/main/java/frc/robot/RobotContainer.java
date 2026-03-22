@@ -6,180 +6,193 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DriverStation;
-// MEE according to Phoenix6 examples this is needed for  warning on pathplanner warmup
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-
-
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.commands.R2Jesu_ClimbRaiseHandCommand;
+import frc.robot.commands.R2Jesu_LowerIntakeCommand;
+import frc.robot.commands.R2Jesu_RaiseIntakeCommand;
+import frc.robot.commands.R2Jesu_ShooterModeShootWithLimelight;
+import frc.robot.commands.R2Jesu_ThrowCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.R2Jesu_ClimberSubsystem;
 import frc.robot.subsystems.R2Jesu_IntakeSubsystem;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
-import frc.robot.commands.R2Jesu_ShooterModeShootWithLimelight;
-import frc.robot.commands.R2Jesu_ClimbRaiseHandCommand;
-import frc.robot.commands.R2Jesu_LowerIntakeCommand;
-import frc.robot.commands.R2Jesu_RaiseIntakeCommand;
-import frc.robot.commands.R2Jesu_ThrowCommand;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) - 1.0; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see setting
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity - change to rotate faster
+  private double MaxSpeed =
+      TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
+          - 1.0; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see
+  // setting
+  private double MaxAngularRate =
+      RotationsPerSecond.of(0.75)
+          .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity - change to
+  // rotate faster
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors - can change to velocity 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric drive =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1)
+          .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(
+              DriveRequestType
+                  .OpenLoopVoltage); // Use open-loop control for drive motors - can change to
+  // velocity
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
-    private final CommandXboxController joystick2 = new CommandXboxController(1);
+  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController joystick2 = new CommandXboxController(1);
 
-    public final DriveSubsystem m_robotDrive = TunerConstants.createDrivetrain();
-    public final R2Jesu_ShooterSubsystem m_shooterSubsystem = new R2Jesu_ShooterSubsystem();
-    public final R2Jesu_IntakeSubsystem m_intakeSubsystem = new R2Jesu_IntakeSubsystem();
-    public final R2Jesu_ClimberSubsystem m_climberSubsystem = new R2Jesu_ClimberSubsystem(m_intakeSubsystem);
-    // need to understand why drivetain doesnt = new DriveSubsystem();
+  public final DriveSubsystem m_robotDrive = TunerConstants.createDrivetrain();
+  public final R2Jesu_ShooterSubsystem m_shooterSubsystem = new R2Jesu_ShooterSubsystem();
+  public final R2Jesu_IntakeSubsystem m_intakeSubsystem = new R2Jesu_IntakeSubsystem();
+  public final R2Jesu_ClimberSubsystem m_climberSubsystem =
+      new R2Jesu_ClimberSubsystem(m_intakeSubsystem);
+  // need to understand why drivetain doesnt = new DriveSubsystem();
 
-    private final SlewRateLimiter xLimiter = new SlewRateLimiter(5.0); // 3 m/s^2
-    private final SlewRateLimiter yLimiter = new SlewRateLimiter(5.0);
-    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(Math.PI); // rad/s^2
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(5.0); // 3 m/s^2
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(5.0);
+  private final SlewRateLimiter rotLimiter = new SlewRateLimiter(Math.PI); // rad/s^2
 
-    public RobotContainer() {
-        registerAutoCommands();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-        configureBindings();
-        
-        // MEE ADDED Warmup PathPlanner to avoid Java pauses
-        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
-        System.out.print(MaxSpeed);
+  public RobotContainer() {
+    registerAutoCommands();
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    configureBindings();
 
-    }
-
-    private void registerAutoCommands(){
-
-  NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
-  NamedCommands.registerCommand("ppHang", new SequentialCommandGroup(Commands.print("Command to hang"), Commands.waitSeconds(1), Commands.print("Command to release")));
-  NamedCommands.registerCommand("scoreit", new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
-  NamedCommands.registerCommand("score", new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
-  NamedCommands.registerCommand("hang", new SequentialCommandGroup(Commands.print("Raise arm"), Commands.waitSeconds(1), Commands.print("Drive forward x amount of seconds"), Commands.waitSeconds(1), Commands.print("Pull robot up"), Commands.waitSeconds(5), Commands.print("Release")));
-  NamedCommands.registerCommand("lower_intake", new SequentialCommandGroup (new R2Jesu_LowerIntakeCommand(m_intakeSubsystem)));
-  NamedCommands.registerCommand("throw", new R2Jesu_ThrowCommand(m_shooterSubsystem));
-  NamedCommands.registerCommand("moveitmoveit", AutoBuilder.pathfindToPose(Constants.moveit, Constants.teleopConstraints));
-    
+    // MEE ADDED Warmup PathPlanner to avoid Java pauses
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+    System.out.print(MaxSpeed);
   }
 
-    private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        //var alliance = DriverStation.getAlliance();
-        //if (alliance.get() == DriverStation.Alliance.Blue) {
-            m_robotDrive.setDefaultCommand(
-            // m_robotDrive will execute this command periodically
-            m_robotDrive.applyRequest(() ->
+  private void registerAutoCommands() {
+
+    NamedCommands.registerCommand("ppShoot", Commands.print("Command to shoot preloaded balls"));
+    NamedCommands.registerCommand(
+        "ppHang",
+        new SequentialCommandGroup(
+            Commands.print("Command to hang"),
+            Commands.waitSeconds(1),
+            Commands.print("Command to release")));
+    NamedCommands.registerCommand(
+        "scoreit",
+        new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
+    NamedCommands.registerCommand(
+        "score",
+        new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
+    NamedCommands.registerCommand(
+        "hang",
+        new SequentialCommandGroup(
+            Commands.print("Raise arm"),
+            Commands.waitSeconds(1),
+            Commands.print("Drive forward x amount of seconds"),
+            Commands.waitSeconds(1),
+            Commands.print("Pull robot up"),
+            Commands.waitSeconds(5),
+            Commands.print("Release")));
+    NamedCommands.registerCommand(
+        "lower_intake",
+        new SequentialCommandGroup(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem)));
+    NamedCommands.registerCommand("throw", new R2Jesu_ThrowCommand(m_shooterSubsystem));
+    NamedCommands.registerCommand(
+        "moveitmoveit", AutoBuilder.pathfindToPose(Constants.moveit, Constants.teleopConstraints));
+  }
+
+  private void configureBindings() {
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    m_robotDrive.setDefaultCommand(
+        // m_robotDrive will execute this command periodically
+        m_robotDrive.applyRequest(
+            () ->
                 // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
                 // Apply slew limiters in real-world units (m/s and rad/s) so their
                 // configured limits are meaningful.
-                drive.withVelocityX(yLimiter.calculate(-joystick.getRightY() * MaxSpeed)) // Drive forward with negative Y (forward)
-                     .withVelocityY(xLimiter.calculate(-joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
-                    //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-                    .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-            )
-            );
-        //}
-        //    else {
-        //    m_robotDrive.setDefaultCommand(
-            // m_robotDrive will execute this command periodically
-        //    m_robotDrive.applyRequest(() ->
-                // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
-                // Apply slew limiters in real-world units (m/s and rad/s) so their
-                // configured limits are meaningful.
-        //        drive.withVelocityX(yLimiter.calculate(joystick.getRightY() * MaxSpeed)) // Drive forward with negative Y (forward)
-        //             .withVelocityY(xLimiter.calculate(joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
-        //            //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-        //            .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
-        //    )
-        //   );
+                drive
+                    .withVelocityX(
+                        yLimiter.calculate(
+                            -joystick.getRightY()
+                                * MaxSpeed)) // Drive forward with negative Y (forward)
+                    .withVelocityY(
+                        xLimiter.calculate(
+                            -joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
+                    // .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() *
+                    // MaxAngularRate)) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(
+                        rotLimiter.calculate(
+                            -joystick.getLeftX()
+                                * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+            ));
 
-        //    }
+    // Idle while the robot is disabled. This ensures the configured
+    // neutral mode is applied to the drive motors while disabled.
+    final var idle = new SwerveRequest.Idle();
+    RobotModeTriggers.disabled()
+        .whileTrue(m_robotDrive.applyRequest(() -> idle).ignoringDisable(true));
 
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode is applied to the drive motors while disabled.
-        final var idle = new SwerveRequest.Idle();
-        RobotModeTriggers.disabled().whileTrue(
-            m_robotDrive.applyRequest(() -> idle).ignoringDisable(true)
-        );
-        
-        // MEE brake locks wheels into an X-stance to lock it into a position
-        //joystick.a().whileTrue(m_robotDrive.applyRequest(() -> brake));
-        //joystick.b().whileTrue(m_robotDrive.applyRequest(() ->
-          //  point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-       // ));
+    // MEE brake locks wheels into an X-stance to lock it into a position
+    // joystick.a().whileTrue(m_robotDrive.applyRequest(() -> brake));
+    // joystick.b().whileTrue(m_robotDrive.applyRequest(() ->
+    //  point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+    // ));
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        /* joystick.back().and(joystick.y()).whileTrue(m_robotDrive.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(m_robotDrive.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kReverse));
-        */
-        // MEE reset the field-centric heading on left bumper press, redefines what is forward TEST ME
-        //joystick2.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
+    // Run SysId routines when holding back/start and X/Y.
+    // Note that each routine should be run exactly once in a single log.
+    /* joystick.back().and(joystick.y()).whileTrue(m_robotDrive.sysIdDynamic(Direction.kForward));
+    joystick.back().and(joystick.x()).whileTrue(m_robotDrive.sysIdDynamic(Direction.kReverse));
+    joystick.start().and(joystick.y()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kForward));
+    joystick.start().and(joystick.x()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kReverse));
+    */
+    // MEE reset the field-centric heading on left bumper press, redefines what is forward TEST ME
+    // joystick2.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
 
-        m_robotDrive.registerTelemetry(logger::telemeterize);
+    m_robotDrive.registerTelemetry(logger::telemeterize);
 
-        //R2JESU Driver Buttons and such
-        joystick.rightTrigger().whileTrue(new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
-            joystick));
-        joystick.leftTrigger().whileTrue(new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive,
-            joystick));
-        joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
+    // R2JESU Driver Buttons and such
+    joystick
+        .rightTrigger()
+        .whileTrue(
+            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
+    joystick
+        .leftTrigger()
+        .whileTrue(
+            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
+    joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
-        joystick2.button(1).onTrue(
+    joystick2
+        .button(1)
+        .onTrue(
             new ConditionalCommand(
-            AutoBuilder.pathfindToPose(Constants.kLeftHang, Constants.teleopConstraints),
-            AutoBuilder.pathfindToPose(Constants.kRightHang, Constants.teleopConstraints),
-            () -> m_robotDrive.getState().Pose.getY() < 2.94
-            )
-        );
+                AutoBuilder.pathfindToPose(Constants.kLeftHang, Constants.teleopConstraints),
+                AutoBuilder.pathfindToPose(Constants.kRightHang, Constants.teleopConstraints),
+                () -> m_robotDrive.getState().Pose.getY() < 2.94));
 
-        joystick.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
-        joystick.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
+    joystick.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
+    joystick.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
 
-        joystick2.button(4).onTrue(new R2Jesu_ClimbRaiseHandCommand(m_climberSubsystem));
-        //joystick button 1 is red, 2 is green, 3 is blue, 4 is yellow
-    }
+    joystick2.button(4).onTrue(new R2Jesu_ClimbRaiseHandCommand(m_climberSubsystem));
+    // joystick button 1 is red, 2 is green, 3 is blue, 4 is yellow
+  }
 
-    public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-    }
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+  }
 }
