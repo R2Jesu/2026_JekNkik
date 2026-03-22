@@ -155,7 +155,7 @@ public class R2Jesu_IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("encoderdistance", intake_armEncoder.getDistance());
-    SmartDashboard.putBoolean("isIntakeRaised", isIntakeRaised());
+    SmartDashboard.putBoolean("isIntakeLowered", !isIntakeRaised());
     down_pidOutput = m_armDownController.calculate(intake_armEncoder.getDistance(),intake_armPositions[targetPosition]);
     up_pidOutput = m_armUpController.calculate(intake_armEncoder.getDistance(),intake_armPositions[targetPosition]); 
     rpm = intakeRpmEntry != null ? intakeRpmEntry.getDouble(intake_lower_wheel_rpm) : intake_lower_wheel_rpm;

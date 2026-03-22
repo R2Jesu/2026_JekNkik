@@ -23,6 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import edu.wpi.first.cameraserver.CameraServer; 
 
@@ -42,9 +45,13 @@ public class Robot extends TimedRobot {
   private final Field2d ourfield = new Field2d(); //R2JESU
   double omegaRPS; //R2JESU
   Optional<Alliance> alliance = DriverStation.getAlliance();
+  private List<Double> trenchTags = new ArrayList<>();
+
+  boolean trenchHazard;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+
   }
 
 
@@ -87,6 +94,15 @@ public class Robot extends TimedRobot {
       builder.addDoubleProperty("Robot Angle", () -> m_robotContainer.m_robotDrive.getState().Pose.getRotation().getRadians(), null);
       }
     });
+    trenchTags.add(7.0);
+    trenchTags.add(6.0);
+    trenchTags.add(12.0);
+    trenchTags.add(1.0);
+    trenchTags.add(17.0);
+    trenchTags.add(28.0);
+    trenchTags.add(22.0);
+    trenchTags.add(23.0);
+
     }
 
   @Override
@@ -103,7 +119,7 @@ public class Robot extends TimedRobot {
     //omegaRPS = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
 
     // PHX6ex includes && Math.abs(omegaRps)<2.0 ... radians per second, not degrees
-    if (myLimelightPose != null && myLimelightPose.tagCount > 0 && myLimelightPose.avgTagDist < 6.0 && myLimelightPose.tagSpan > 0.1) {
+    if (myLimelightPose != null && myLimelightPose.tagCount > 0 && myLimelightPose.avgTagDist < 6.0) {
         m_robotContainer.m_robotDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.9, 0.9, 0.9));
         m_robotContainer.m_robotDrive.addVisionMeasurement(myLimelightPose.pose, myLimelightPose.timestampSeconds);
       }
@@ -115,10 +131,21 @@ public class Robot extends TimedRobot {
 
     //odometry aiming and ranging: docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-aiming-and-ranging
 
+    if (myLimelightPose != null && myLimelightPose.tagCount > 0 && myLimelightPose.avgTagDist < 2.0 
+          && trenchTags.contains(LimelightHelpers.getFiducialID(Constants.kLimelightName))
+          && m_robotContainer.m_intakeSubsystem.isIntakeRaised()) {
+
+            trenchHazard = true; 
+          }
+    else {
+      trenchHazard = false;
+    }
+    
     SmartDashboard.putString("Choice", m_autonomousCommand.toString());
     //SmartDashboard.putNumber("Tag Count", myLimelightPose.tagCount);
     SmartDashboard.putNumber("Pigeonyaw", m_robotContainer.m_robotDrive.getState().RawHeading.getDegrees());
     SmartDashboard.putNumber("pigeon2 yaw", Math.floorMod((int) getPigeon().getYaw().getValueAsDouble(), 360));
+    SmartDashboard.putBoolean("trenchHazard", !trenchHazard);
     //SmartDashboard.putNumber("Distance", distance);
     //SmartDashboard.putNumber("omegaRPS", Math.abs(omegaRPS));
     //SmartDashboard.putNumber("Robotx", m_robotContainer.m_robotDrive.getState().Pose.getX());

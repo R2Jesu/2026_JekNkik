@@ -46,7 +46,7 @@ import frc.robot.commands.R2Jesu_RaiseIntakeCommand;
 import frc.robot.commands.R2Jesu_ThrowCommand;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see setting
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) - 1.0; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see setting
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity - change to rotate faster
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -101,7 +101,9 @@ public class RobotContainer {
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        m_robotDrive.setDefaultCommand(
+        //var alliance = DriverStation.getAlliance();
+        //if (alliance.get() == DriverStation.Alliance.Blue) {
+            m_robotDrive.setDefaultCommand(
             // m_robotDrive will execute this command periodically
             m_robotDrive.applyRequest(() ->
                 // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
@@ -112,7 +114,23 @@ public class RobotContainer {
                     //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
                     .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
             )
-        );
+            );
+        //}
+        //    else {
+        //    m_robotDrive.setDefaultCommand(
+            // m_robotDrive will execute this command periodically
+        //    m_robotDrive.applyRequest(() ->
+                // Scale joystick [-1,1] to velocity (m/s) and rotational rate (rad/s).
+                // Apply slew limiters in real-world units (m/s and rad/s) so their
+                // configured limits are meaningful.
+        //        drive.withVelocityX(yLimiter.calculate(joystick.getRightY() * MaxSpeed)) // Drive forward with negative Y (forward)
+        //             .withVelocityY(xLimiter.calculate(joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
+        //            //.withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+        //            .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() * MaxAngularRate)) // Drive counterclockwise with negative X (left)
+        //    )
+        //   );
+
+        //    }
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -135,7 +153,7 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kReverse));
         */
         // MEE reset the field-centric heading on left bumper press, redefines what is forward TEST ME
-        joystick.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
+        //joystick2.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
 
         m_robotDrive.registerTelemetry(logger::telemeterize);
 

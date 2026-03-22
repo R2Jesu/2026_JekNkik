@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.237722419928826,
-        "y": 4.503024911032028
+        "x": 7.796595492289443,
+        "y": 4.459988137603796
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.465874157029878,
-        "y": 4.40081539651517
+        "x": 8.024747229390496,
+        "y": 4.357778623086937
       },
       "isLocked": true,
       "linkedName": "e_left_george_col"
@@ -20,8 +20,8 @@
         "y": 7.386488730723606
       },
       "prevControl": {
-        "x": 8.463665480427046,
-        "y": 7.967485172004745
+        "x": 9.658653172813473,
+        "y": 7.386488730723605
       },
       "nextControl": null,
       "isLocked": false,
@@ -36,7 +36,7 @@
     "maxVelocity": 6.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 180.0,
-    "maxAngularAcceleration": 90.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 
 import static edu.wpi.first.units.Units.*;
 import java.util.ArrayList;
@@ -91,15 +92,18 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   private double m_hoopRadius = 23.5*0.0254; // meters-radius of the target, defined constant 41.17/2
   private double m_gAccelGravity = 9.81; //Acceleration due to gravity approximation m/s2, constant
   private double m_launcherSetback= 9.5*0.0254; // distance in meters that the shooter is set back from the limelight ?5"?
-  private double m_tLaunchAngle = Math.toRadians(68.9); // Launch angle relative to the horizontal in degrees, constant
+  private double m_tLaunchAngle = Math.toRadians(38.9); // Launch angle relative to the horizontal in degrees, constant
   private double m_numerator = 0;
   private double m_denominator = 0;
   private double m_kRpmsCalc = 0;
+  private double runVelocity = 0;
 
   Optional<Alliance> alliance = DriverStation.getAlliance();
   private PoseEstimate pose;
 
   PIDController pid = new PIDController(.01, 0.00, 0.00);
+
+  private Timer theTimer = new Timer();
 
   /**
    * Constructs an instance of the aim with limelight command.
@@ -155,12 +159,17 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     LimelightHelpers.SetIMUAssistAlpha(Constants.kLimelightName, .01);
  //   double dMeters = pose.avgTagDist + m_hoopRadius + m_launcherSetback;
    // SmartDashboard.putNumber("dmeter", dMeters);
+   theTimer.start();
+   theTimer.reset();
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    m_isFinished=false;
+    theTimer.reset();
 
     if (LimelightHelpers.getTV(Constants.kLimelightName)) {//As I understand, the pipeline defines the AprilTag to look for.  There may be a way to further refine.
           m_angleToAprilTag = LimelightHelpers.getTX(Constants.kLimelightName);
@@ -169,7 +178,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
           //If we are looking at the offset tags and from the right take a margin off the ajustment to keep it more centered
           //Need to check that a positive angle to tag is correct but I think it all runs counterclockwise.  Need to verify.
           if ( adjTags.contains(LimelightHelpers.getFiducialID(Constants.kLimelightName)) && m_angleToAprilTag < 0) {
-            m_newAngleHeading = m_newAngleHeading + 5.0;
+            m_newAngleHeading = m_newAngleHeading + 9.0;
           }
           m_verticalAngleToAprilTag = LimelightHelpers.getTY(Constants.kLimelightName);
           m_distanceToAprilTag = m_limeLightToAprilTagVerticalDistance / Math.tan(Math.toRadians(m_verticalAngleToAprilTag));
@@ -190,11 +199,23 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   // Scale joystick inputs to meters/sec so the drivetrain sees real-world speeds
   // (TunerConstants.kSpeedAt12Volts is the theoretical max speed at 12V)
   double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-  m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY() * maxSpeed))
-    .withVelocityY(xLimiter.calculate(-m_joystick.getRightX() * maxSpeed))
-    .withRotationalRate(m_rotation));
+  var alliance = DriverStation.getAlliance();
+  //if (alliance.get() == DriverStation.Alliance.Blue) {
+      m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(-m_joystick.getRightY() * maxSpeed))
+        .withVelocityY(xLimiter.calculate(-m_joystick.getRightX() * maxSpeed))
+        .withRotationalRate(m_rotation));
+  //} else {
+       m_drivetrain.setControl(m_PIDAim.withVelocityX(yLimiter.calculate(m_joystick.getRightY() * maxSpeed))
+        .withVelocityY(xLimiter.calculate(m_joystick.getRightX() * maxSpeed))
+        .withRotationalRate(m_rotation));   
+  //}
         
     m_shooterSubsystem.runShooter(rpmForDistance());
+
+    if (theTimer.hasElapsed(5) && m_joystick.getRightTriggerAxis() == 0 && m_joystick.getLeftTriggerAxis() == 0) {
+      m_isFinished=true;
+      System.out.println("Timer elapsed and exited");
+    }
 
   }
  
@@ -217,10 +238,12 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
     boolean m_shotpossible = true;
     SmartDashboard.putBoolean("ShotPossible", m_shotpossible);
-        if (pose == null) {
+    if (pose == null) {
+      System.out.println("Null pose");
       // Limelight didn't return a pose estimate; fall back to a safe default RPM
       m_shotpossible = false;
-      SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);  // what is this printing out if we are returning default velocity?
+      SmartDashboard.putNumber("Shoot RPM1", kRpms[0]);
+      SmartDashboard.putBoolean("impossibleShot", m_shotpossible);  // what is this printing out if we are returning default velocity?
       return m_defaultVelocity; // default velocity to return set in variable section
     }
 // avgTagDist is off by 1-4 inches; suspect angles are the problem
@@ -240,21 +263,22 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     SmartDashboard.putNumber("denominator", m_denominator);
 
     // make sure shot is physically possible, if not ... do ??? nothing ??? LED light???
-      if(m_denominator<=0) {
+    if(m_denominator<=0) {
       m_shotpossible=false;
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
-      return 0; //set status light
+      return runVelocity; //set status light
     }
     else {
       // this is in m/s - need to convert m/s to rpm by ???velocityMps / 2 * Math.PI * wheelRadiusMeters)*GearRatio
       // m/s is 251 RPM
       m_shotpossible=true;
-      double m_factor = 2.2; //multiplier for basketball-fuel conversion
+      double m_factor = 2.0; //multiplier for basketball-fuel conversion
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
       m_kRpmsCalc=(Math.sqrt(m_numerator/m_denominator)*187.97);
       double m_maxVelocity=5000.0; // max velocity for motor, if number is greater than this only send the max
       SmartDashboard.putNumber("kRpms Calc", MathUtil.clamp(m_kRpmsCalc*m_factor,0.0,m_maxVelocity));      
-      return MathUtil.clamp(m_kRpmsCalc*m_factor,0.0,m_maxVelocity); // prevents sending impossible value to motors
+      runVelocity = MathUtil.clamp(m_kRpmsCalc*m_factor,0.0,m_maxVelocity); // prevents sending impossible value to motors
+      return runVelocity;
      }
 /* 
 // Calculate velocity based on fixed array of velocity/distance pairs

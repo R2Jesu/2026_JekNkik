@@ -44,14 +44,19 @@
       "linkedName": "e_george_shoot"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.9396092362344721,
+      "rotationDegrees": 17.588907115728734
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 6.0,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 180.0,
+    "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 90.0,
     "nominalVoltage": 12.0,
     "unlimited": false
@@ -66,5 +71,5 @@
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

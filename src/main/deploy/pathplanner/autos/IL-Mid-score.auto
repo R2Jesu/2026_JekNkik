@@ -5,33 +5,21 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "middle_shoot"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "lower_intake"
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Left_George_col"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left_George_run"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left_George_run_shoot"
+            "pathName": "IL-Mid-shoot"
           }
         },
         {
