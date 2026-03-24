@@ -208,8 +208,12 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
 
     m_drivetrain.setControl(
         m_PIDAim
-            .withVelocityX(yLimiter.calculate(-m_joystick.getRightY() * maxSpeed))
-            .withVelocityY(xLimiter.calculate(-m_joystick.getRightX() * maxSpeed))
+            .withVelocityX(yLimiter.calculate(
+              MathUtil.applyDeadband(-m_joystick.getRightY(), Constants.kJoystickDeadband) 
+              * maxSpeed))
+            .withVelocityY(xLimiter.calculate(
+              MathUtil.applyDeadband(-m_joystick.getRightX(), Constants.kJoystickDeadband) 
+              * maxSpeed))
             .withRotationalRate(m_rotation));
 
     m_shooterSubsystem.runShooter(rpmForDistance());

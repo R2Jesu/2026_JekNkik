@@ -217,6 +217,12 @@ public class Robot extends TimedRobot {
       // CommandScheduler.getInstance().schdeuld(m_autonomousCommand)
     }
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 4);
+    //Adding here as well.  Thought is that mayeb robot init doesn't have driver station access.
+    if (alliance.get() == Alliance.Red) {
+      m_robotContainer.m_robotDrive.getPigeon2().setYaw(180.0);
+    } else {
+      m_robotContainer.m_robotDrive.getPigeon2().setYaw(0.0);
+    }
   }
 
   @Override

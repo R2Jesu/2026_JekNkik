@@ -17,4 +17,5 @@ public class Constants {
 
   public static final double default_armSpeed = .25;
   public static final double default_intakeSpeed = .75;
+  public static final double kJoystickDeadband = .1;
 }

@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -129,11 +130,12 @@ public class RobotContainer {
                 drive
                     .withVelocityX(
                         yLimiter.calculate(
-                            -joystick.getRightY()
+                            MathUtil.applyDeadband(-joystick.getRightY(), Constants.kJoystickDeadband)
                                 * MaxSpeed)) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         xLimiter.calculate(
-                            -joystick.getRightX() * MaxSpeed)) // Drive left with negative X (left)
+                            MathUtil.applyDeadband(-joystick.getRightX(), Constants.kJoystickDeadband) 
+                                * MaxSpeed)) // Drive left with negative X (left)
                     // .withRotationalRate(rotLimiter.calculate(-joystick.getLeftX() *
                     // MaxAngularRate)) // Drive counterclockwise with negative X (left)
                     .withRotationalRate(
