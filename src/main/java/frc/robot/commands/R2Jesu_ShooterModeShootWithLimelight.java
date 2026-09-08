@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
@@ -79,7 +80,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   // private static final double[] kRpms      = { 3750, 4000, 4250, 4500, 4750, 5000, 5500 };
   private static final double[] kRpms = {750, 4000, 4250, 2040, 2040, 800, 5500};
   // default speed to return if none can be calculated
-  private double m_defaultVelocity = 1500;
+  private double m_defaultVelocity = 3498;
   // Distance -> RPM Calculation Variables
   private double m_xLaunchDistance =
       0; // Horizontal distance from the release point to the center of the hoop.
@@ -91,9 +92,9 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
       23.5 * 0.0254; // meters-radius of the target, defined constant 41.17/2
   private double m_gAccelGravity = 9.81; // Acceleration due to gravity approximation m/s2, constant
   private double m_launcherSetback =
-      9.5 * 0.0254; // distance in meters that the shooter is set back from the limelight ?5"?
+      -1.0 * 0.0254; // distance in meters that the shooter is set back from the limelight ?5"?
   private double m_tLaunchAngle =
-      Math.toRadians(38.9); // Launch angle relative to the horizontal in degrees, constant
+      Math.toRadians(45); // Launch angle relative to the horizontal in degrees, constant
   private double m_numerator = 0;
   private double m_denominator = 0;
   private double m_kRpmsCalc = 0;
@@ -184,7 +185,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
       // counterclockwise.  Need to verify.
       if (adjTags.contains(LimelightHelpers.getFiducialID(Constants.kLimelightName))
           && m_angleToAprilTag < 0) {
-        m_newAngleHeading = m_newAngleHeading + 9.0;
+        m_newAngleHeading = m_newAngleHeading + 8.0;
       }
       // m_verticalAngleToAprilTag = LimelightHelpers.getTY(Constants.kLimelightName);
       // m_distanceToAprilTag = m_limeLightToAprilTagVerticalDistance /
@@ -204,7 +205,7 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
 
     // Scale joystick inputs to meters/sec so the drivetrain sees real-world speeds
     // (TunerConstants.kSpeedAt12Volts is the theoretical max speed at 12V)
-    double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) - 1.5;
 
     m_drivetrain.setControl(
         m_PIDAim
@@ -241,8 +242,22 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
   }
 
   private double rpmForDistance() {
+    //System.out.println("Calculating rpm");
+    LimelightHelpers.SetRobotOrientation(
+    Constants.kLimelightName,
+    m_drivetrain.getState().RawHeading.getDegrees(),
+    0,
+    0,
+    0,
+    0,
+    0);
+/*     alliance = DriverStation.getAlliance();
+    if (alliance.get() == Alliance.Red && Robot.teleopEra) {
+      pose = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(Constants.kLimelightName);
+    } else { */
+      pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
+   // } 
 
-    pose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.kLimelightName);
     boolean m_shotpossible = true;
     SmartDashboard.putBoolean("ShotPossible", m_shotpossible);
     if (pose == null) {
@@ -278,13 +293,17 @@ public class R2Jesu_ShooterModeShootWithLimelight extends Command {
     if (m_denominator <= 0) {
       m_shotpossible = false;
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
-      return runVelocity; // set status light
+      if (runVelocity > 0.0) {
+        return runVelocity; 
+      } else {
+        return m_defaultVelocity;
+      }
     } else {
       // this is in m/s - need to convert m/s to rpm by ???velocityMps / 2 * Math.PI *
       // wheelRadiusMeters)*GearRatio
       // m/s is 251 RPM
       m_shotpossible = true;
-      double m_factor = 2.0; // multiplier for basketball-fuel conversion
+      double m_factor = 2.1; // multiplier for basketball-fuel conversion
       SmartDashboard.putBoolean("impossibleShot", m_shotpossible);
       m_kRpmsCalc = (Math.sqrt(m_numerator / m_denominator) * 187.97);
       double m_maxVelocity =

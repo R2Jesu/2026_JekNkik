@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class R2Jesu_ShooterSubsystem extends SubsystemBase {
   private SparkMax shooterMotor = new SparkMax(52, MotorType.kBrushless);
   private SparkMax kickerbarMotor = new SparkMax(53, MotorType.kBrushed);
+  private SparkMax kickerbar2Motor = new SparkMax(55, MotorType.kBrushless);
 
   /** Creates a new R2Jesu_ShooterSubsystem. */
   private final SparkClosedLoopController shooterController =
@@ -40,6 +41,7 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
 
     shooterMotor.configure(
         shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
   }
 
   /**
@@ -58,17 +60,36 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
   }
 
   public void runShooter(double speed) {
-    shooterController.setSetpoint(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (speed > 0.0) {
+    if (speed == 0.0) {
+      shooterController.setSetpoint(speed, ControlType.kDutyCycle);
+    } else{
+      shooterController.setSetpoint(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    }
+/*     if (speed > 0.0) {
       kickerbarMotor.set(-1.0);
+      kickerbar2Motor.set(.20);
     } else {
       kickerbarMotor.set(0.0);
-    }
+      kickerbar2Motor.set(0.0);
+    } */
     SmartDashboard.putNumber("Subsystem shoot speed", speed);
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    if ((shooterController.getSetpoint() > 0.0  
+        && (shooterMotor.getEncoder().getVelocity() >= (shooterController.getSetpoint() * .80)))) {
+      kickerbarMotor.set(-1.0);
+      kickerbar2Motor.set(.10);
+    } else {
+      kickerbarMotor.set(0.0);
+      kickerbar2Motor.set(0.0);
+    }
+    SmartDashboard.putNumber("Shoot setpoint", shooterController.getSetpoint());
+    SmartDashboard.putNumber("Actual Speed", shooterMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Current", shooterMotor.getOutputCurrent());
+    SmartDashboard.putNumber("BusVolt", shooterMotor.getBusVoltage());
+  }
 
   @Override
   public void simulationPeriodic() {

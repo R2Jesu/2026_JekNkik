@@ -9,6 +9,7 @@ package frc.robot;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
@@ -44,8 +45,10 @@ public class Robot extends TimedRobot {
   double omegaRPS; // R2JESU
   Optional<Alliance> alliance = DriverStation.getAlliance();
   private List<Double> trenchTags = new ArrayList<>();
+  LimelightHelpers.PoseEstimate myLimelightPose; 
 
   boolean trenchHazard;
+  public static boolean teleopEra;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -61,12 +64,16 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CameraServer.startAutomaticCapture();
     SmartDashboard.putData("Field", ourfield);
+    teleopEra=false;
     m_robotContainer.m_robotDrive.getPigeon2().reset();
+/*     alliance = DriverStation.getAlliance();
     if (alliance.get() == Alliance.Red) {
+      System.out.println("Red, setting yaw 180");
       m_robotContainer.m_robotDrive.getPigeon2().setYaw(180.0);
     } else {
+      System.out.println("Not red, set to 0 yaw");
       m_robotContainer.m_robotDrive.getPigeon2().setYaw(0.0);
-    }
+    }  */
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 1);
     SmartDashboard.putData(
@@ -143,13 +150,19 @@ public class Robot extends TimedRobot {
         0,
         0,
         0);
-    LimelightHelpers.PoseEstimate myLimelightPose =
+/*     alliance = DriverStation.getAlliance();
+    if (alliance.get() == Alliance.Red && teleopEra) {
+    myLimelightPose =
+        LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(
+            Constants.kLimelightName);
+    } else {
+    myLimelightPose = */
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
-            Constants.kLimelightName); // changed "limelight" to constant for consistency
-
+            Constants.kLimelightName);
+  //  } 
+ // changed "limelight" to constant for consistency
     // MEE PHX6ex? omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
     // omegaRPS = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
-
     // PHX6ex includes && Math.abs(omegaRps)<2.0 ... radians per second, not degrees
     if (myLimelightPose != null
         && myLimelightPose.tagCount > 0
@@ -218,11 +231,15 @@ public class Robot extends TimedRobot {
     }
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 4);
     //Adding here as well.  Thought is that mayeb robot init doesn't have driver station access.
-    if (alliance.get() == Alliance.Red) {
+    alliance = DriverStation.getAlliance();
+    // && m_autonomousCommand.getName() == "None"
+/*      if (alliance.get() == Alliance.Red) {
       m_robotContainer.m_robotDrive.getPigeon2().setYaw(180.0);
+      System.out.println("Setting 180 yaw");
     } else {
       m_robotContainer.m_robotDrive.getPigeon2().setYaw(0.0);
-    }
+      System.out.println("Setting yaw 0");
+    }  */
   }
 
   @Override
@@ -238,6 +255,11 @@ public class Robot extends TimedRobot {
           .cancel(); // mee PHX6ex  CommandScheduler.getInstance().cancel(m_autonomousCommand);
     }
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 4);
+    teleopEra=true;
+    alliance = DriverStation.getAlliance();
+    if (alliance.get() == Alliance.Red) {
+      m_robotContainer.m_robotDrive.setOperatorPerspectiveForward(Rotation2d.fromDegrees(180));
+    }
   }
 
   @Override

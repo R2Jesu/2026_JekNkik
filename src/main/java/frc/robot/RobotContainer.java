@@ -22,21 +22,21 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import frc.robot.commands.R2Jesu_ClimbRaiseHandCommand;
+//import frc.robot.commands.R2Jesu_ClimbRaiseHandCommand;
 import frc.robot.commands.R2Jesu_LowerIntakeCommand;
 import frc.robot.commands.R2Jesu_RaiseIntakeCommand;
 import frc.robot.commands.R2Jesu_ShooterModeShootWithLimelight;
 import frc.robot.commands.R2Jesu_ThrowCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.R2Jesu_ClimberSubsystem;
+//import frc.robot.subsystems.R2Jesu_ClimberSubsystem;
 import frc.robot.subsystems.R2Jesu_IntakeSubsystem;
 import frc.robot.subsystems.R2Jesu_ShooterSubsystem;
 
 public class RobotContainer {
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
-          - 1.0; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see
+          - 1.5; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see
   // setting
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75)
@@ -65,8 +65,8 @@ public class RobotContainer {
   public final DriveSubsystem m_robotDrive = TunerConstants.createDrivetrain();
   public final R2Jesu_ShooterSubsystem m_shooterSubsystem = new R2Jesu_ShooterSubsystem();
   public final R2Jesu_IntakeSubsystem m_intakeSubsystem = new R2Jesu_IntakeSubsystem();
-  public final R2Jesu_ClimberSubsystem m_climberSubsystem =
-      new R2Jesu_ClimberSubsystem(m_intakeSubsystem);
+  //public final R2Jesu_ClimberSubsystem m_climberSubsystem =
+  //    new R2Jesu_ClimberSubsystem(m_intakeSubsystem);
   // need to understand why drivetain doesnt = new DriveSubsystem();
 
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(5.0); // 3 m/s^2
@@ -164,19 +164,19 @@ public class RobotContainer {
     joystick.start().and(joystick.x()).whileTrue(m_robotDrive.sysIdQuasistatic(Direction.kReverse));
     */
     // MEE reset the field-centric heading on left bumper press, redefines what is forward TEST ME
-    // joystick2.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
+    joystick2.leftBumper().onTrue(m_robotDrive.runOnce(() -> m_robotDrive.seedFieldCentric()));
 
     m_robotDrive.registerTelemetry(logger::telemeterize);
 
     // R2JESU Driver Buttons and such
-    joystick
+   /*  joystick
         .rightTrigger()
         .whileTrue(
             new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
     joystick
         .leftTrigger()
         .whileTrue(
-            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
+            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick)); */
     joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
     joystick2
@@ -190,7 +190,7 @@ public class RobotContainer {
     joystick.button(1).onTrue(new R2Jesu_LowerIntakeCommand(m_intakeSubsystem));
     joystick.button(2).onTrue(new R2Jesu_RaiseIntakeCommand(m_intakeSubsystem));
 
-    joystick2.button(4).onTrue(new R2Jesu_ClimbRaiseHandCommand(m_climberSubsystem));
+    //joystick2.button(4).onTrue(new R2Jesu_ClimbRaiseHandCommand(m_climberSubsystem));
     // joystick button 1 is red, 2 is green, 3 is blue, 4 is yellow
   }
 
