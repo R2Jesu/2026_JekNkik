@@ -34,7 +34,7 @@ public class R2Jesu_ThrowCommand extends Command {
   @Override
   public void execute() {
     System.out.println("Execute");
-    m_shooterSubsystem.runShooter(Constants.kDefaultShootSpeed);
+    m_shooterSubsystem.runShooter(m_shooterSubsystem.getThrowRpm());
   }
 
   // Called once the command ends or is interrupted.

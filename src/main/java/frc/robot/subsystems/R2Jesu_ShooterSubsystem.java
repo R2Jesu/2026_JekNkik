@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -13,15 +15,20 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import edu.wpi.first.networktables.GenericEntry;
 
 public class R2Jesu_ShooterSubsystem extends SubsystemBase {
   private SparkMax shooterMotor = new SparkMax(52, MotorType.kBrushless);
   private SparkMax kickerbarMotor = new SparkMax(53, MotorType.kBrushed);
   private SparkMax kickerbar2Motor = new SparkMax(55, MotorType.kBrushless);
-
+  private GenericEntry ThrowRpmEntry;
   /** Creates a new R2Jesu_ShooterSubsystem. */
   private final SparkClosedLoopController shooterController =
       shooterMotor.getClosedLoopController();
@@ -41,7 +48,12 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
 
     shooterMotor.configure(
         shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
+    ThrowRpmEntry =
+        Shuffleboard.getTab("Throw")
+            .add("Throw RPM", Constants.kDefaultShootSpeed)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 1000, "max", 5000))
+            .getEntry();
   }
 
   /**
@@ -59,6 +71,12 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
         });
   }
 
+
+  public double getThrowRpm() {
+      return ThrowRpmEntry != null
+            ? ThrowRpmEntry.getDouble(Constants.kDefaultShootSpeed)
+            : Constants.kDefaultShootSpeed;
+  }
   public void runShooter(double speed) {
     if (speed == 0.0) {
       shooterController.setSetpoint(speed, ControlType.kDutyCycle);
