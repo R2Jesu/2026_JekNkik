@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
   LimelightHelpers.PoseEstimate myLimelightPose; 
 
   boolean trenchHazard;
-  public static boolean teleopEra;
+  public static boolean perspectiveSet;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CameraServer.startAutomaticCapture();
     SmartDashboard.putData("Field", ourfield);
-    teleopEra=false;
+    perspectiveSet=false;
     m_robotContainer.m_robotDrive.getPigeon2().reset();
 /*     alliance = DriverStation.getAlliance();
     if (alliance.get() == Alliance.Red) {
@@ -155,8 +155,8 @@ public class Robot extends TimedRobot {
     myLimelightPose =
         LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(
             Constants.kLimelightName);
-    } else {
-    myLimelightPose = */
+    } else { */
+    myLimelightPose = 
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(
             Constants.kLimelightName);
   //  } 
@@ -192,8 +192,19 @@ public class Robot extends TimedRobot {
       trenchHazard = false;
     }
 
+    alliance = DriverStation.getAlliance();
+    if (alliance.get() == Alliance.Red && !perspectiveSet) {
+      perspectiveSet=true;
+      m_robotContainer.m_robotDrive.setOperatorPerspectiveForward(Rotation2d.fromDegrees(180));
+    }
+    else {
+      perspectiveSet=true;
+    }
+
     SmartDashboard.putString("Choice", m_autonomousCommand.toString());
-    // SmartDashboard.putNumber("Tag Count", myLimelightPose.tagCount);
+/*     if (myLimelightPose != null) {
+       SmartDashboard.putNumber("Tag Count", myLimelightPose.tagCount);
+    } */
     SmartDashboard.putNumber(
         "Pigeonyaw", m_robotContainer.m_robotDrive.getState().RawHeading.getDegrees());
     SmartDashboard.putNumber(
@@ -205,7 +216,7 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("Roboty", m_robotContainer.m_robotDrive.getState().Pose.getY());
     // SmartDashboard.putNumber("Robotrotation",
     // m_robotContainer.m_robotDrive.getState().Pose.getRotation().getDegrees());
-    // SmartDashboard.putNumber("Limelightx", poseEstimate.pose.getX());
+     //SmartDashboard.putNumber("Limelightx", poseEstimate.pose.getX());
     // SmartDashboard.putNumber("Limelighty", poseEstimate.pose.getY());
     // SmartDashboard.putNumber("Limelightrotation", poseEstimate.pose.getRotation().getDegrees());
   }
@@ -255,15 +266,14 @@ public class Robot extends TimedRobot {
           .cancel(); // mee PHX6ex  CommandScheduler.getInstance().cancel(m_autonomousCommand);
     }
     LimelightHelpers.SetIMUMode(Constants.kLimelightName, 4);
-    teleopEra=true;
-    alliance = DriverStation.getAlliance();
-    if (alliance.get() == Alliance.Red) {
-      m_robotContainer.m_robotDrive.setOperatorPerspectiveForward(Rotation2d.fromDegrees(180));
-    }
+    perspectiveSet=false;
+
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+  }
 
   @Override
   public void teleopExit() {}

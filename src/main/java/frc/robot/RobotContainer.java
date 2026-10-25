@@ -39,7 +39,7 @@ public class RobotContainer {
           - 1.5; // kSpeedAt12Volts desired top speed set to 1 initially - press fn f12 to see
   // setting
   private double MaxAngularRate =
-      RotationsPerSecond.of(0.75)
+      RotationsPerSecond.of(0.50)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity - change to
   // rotate faster
 
@@ -169,14 +169,14 @@ public class RobotContainer {
     m_robotDrive.registerTelemetry(logger::telemeterize);
 
     // R2JESU Driver Buttons and such
-   /*  joystick
+    joystick
         .rightTrigger()
         .whileTrue(
             new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
     joystick
         .leftTrigger()
         .whileTrue(
-            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick)); */
+            new R2Jesu_ShooterModeShootWithLimelight(m_shooterSubsystem, m_robotDrive, joystick));
     joystick.button(3).whileTrue(new R2Jesu_ThrowCommand(m_shooterSubsystem));
 
     joystick2

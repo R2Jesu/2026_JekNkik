@@ -1292,6 +1292,7 @@ public class LimelightHelpers {
    * @return
    */
   public static PoseEstimate getBotPoseEstimate_wpiBlue(String limelightName) {
+    //System.out.println(limelightName);
     return getBotPoseEstimate(limelightName, "botpose_wpiblue", false);
   }
 
@@ -1304,6 +1305,7 @@ public class LimelightHelpers {
    * @return
    */
   public static PoseEstimate getBotPoseEstimate_wpiBlue_MegaTag2(String limelightName) {
+    //System.out.println("limeliget" + limelightName);
     return getBotPoseEstimate(limelightName, "botpose_orb_wpiblue", true);
   }
 
