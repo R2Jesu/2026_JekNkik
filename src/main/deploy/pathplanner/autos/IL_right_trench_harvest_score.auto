@@ -13,7 +13,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
@@ -29,27 +29,28 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "throw"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "George_HP"
+            "pathName": "George_run_shoot"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "George_shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "score "
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "scoreit"
+                }
+              }
+            ]
           }
         }
       ]

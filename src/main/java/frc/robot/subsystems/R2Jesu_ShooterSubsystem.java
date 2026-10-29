@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
 import java.util.Map;
 
 import com.revrobotics.PersistMode;
@@ -16,38 +13,48 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.Constants;
+import edu.wpi.first.networktables.GenericEntry;
 
 public class R2Jesu_ShooterSubsystem extends SubsystemBase {
- private SparkMax shooterMotor = new SparkMax(52, MotorType.kBrushless);
- private SparkMax kickerbarMotor = new SparkMax(53, MotorType.kBrushed);
+  private SparkMax shooterMotor = new SparkMax(52, MotorType.kBrushless);
+  private SparkMax kickerbarMotor = new SparkMax(53, MotorType.kBrushed);
+  private SparkMax kickerbar2Motor = new SparkMax(55, MotorType.kBrushless);
+  private GenericEntry ThrowRpmEntry;
   /** Creates a new R2Jesu_ShooterSubsystem. */
- private final SparkClosedLoopController shooterController = shooterMotor.getClosedLoopController();
-
+  private final SparkClosedLoopController shooterController =
+      shooterMotor.getClosedLoopController();
 
   public R2Jesu_ShooterSubsystem() {
     // Query some boolean state, such as a digital sensor.
-    SparkMaxConfig shooterConfig=new SparkMaxConfig();
+    SparkMaxConfig shooterConfig = new SparkMaxConfig();
     shooterConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1);
 
-    shooterConfig.closedLoop
-    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(.001)
-    .i(0.0000007)
-    .d(0.00001)
-    .outputRange(0, 1);
+    shooterConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(.001)
+        .i(0.0000007)
+        .d(0.00001)
+        .outputRange(0, 1);
 
-    shooterMotor.configure(shooterConfig, 
-    ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    shooterMotor.configure(
+        shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    ThrowRpmEntry =
+        Shuffleboard.getTab("Throw")
+            .add("Throw RPM", Constants.kDefaultShootSpeed)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 1000, "max", 5000))
+            .getEntry();
   }
-
 
   /**
    * R2Jesu_Shooter command factory method.
@@ -59,28 +66,47 @@ public class R2Jesu_ShooterSubsystem extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
-          //shooterController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+          // shooterController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
           /* one-time action goes here */
         });
   }
 
-  
 
+  public double getThrowRpm() {
+      return ThrowRpmEntry != null
+            ? ThrowRpmEntry.getDouble(Constants.kDefaultShootSpeed)
+            : Constants.kDefaultShootSpeed;
+  }
   public void runShooter(double speed) {
-    shooterController.setSetpoint(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if(speed > 0.0) {
+    if (speed == 0.0) {
+      shooterController.setSetpoint(speed, ControlType.kDutyCycle);
+    } else{
+      shooterController.setSetpoint(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    }
+/*     if (speed > 0.0) {
       kickerbarMotor.set(-1.0);
+      kickerbar2Motor.set(.20);
     } else {
       kickerbarMotor.set(0.0);
-    }
+      kickerbar2Motor.set(0.0);
+    } */
     SmartDashboard.putNumber("Subsystem shoot speed", speed);
   }
 
- 
-
   @Override
   public void periodic() {
-   
+    if ((shooterController.getSetpoint() > 0.0  
+        && (shooterMotor.getEncoder().getVelocity() >= (shooterController.getSetpoint() * .80)))) {
+      kickerbarMotor.set(-1.0);
+      kickerbar2Motor.set(.10);
+    } else {
+      kickerbarMotor.set(0.0);
+      kickerbar2Motor.set(0.0);
+    }
+    SmartDashboard.putNumber("Shoot setpoint", shooterController.getSetpoint());
+    SmartDashboard.putNumber("Actual Speed", shooterMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Current", shooterMotor.getOutputCurrent());
+    SmartDashboard.putNumber("BusVolt", shooterMotor.getBusVoltage());
   }
 
   @Override

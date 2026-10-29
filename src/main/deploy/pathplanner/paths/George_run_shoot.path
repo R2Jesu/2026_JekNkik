@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.579596678529064,
+        "y": 0.6404744958481603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.5795966785290636,
+        "y": 0.6404744958481604
+      },
+      "isLocked": false,
+      "linkedName": "g_run_end"
+    },
+    {
+      "anchor": {
+        "x": 2.858233333333333,
+        "y": 0.6404744958481603
+      },
+      "prevControl": {
+        "x": 3.4262901515151514,
+        "y": 0.6266590909090928
+      },
+      "nextControl": {
+        "x": 2.3576006357191144,
+        "y": 0.6526501149445311
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8,
+        "y": 2.17061111111111
+      },
+      "prevControl": {
+        "x": 1.7999999999999998,
+        "y": 2.1706111111111097
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "e_george_shoot"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.9396092362344721,
+      "rotationDegrees": 17.588907115728734
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 6.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 90.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 47.54480437981308
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

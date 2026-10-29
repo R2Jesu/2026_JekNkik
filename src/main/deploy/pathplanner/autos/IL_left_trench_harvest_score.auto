@@ -13,37 +13,44 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_col"
+            "pathName": "Left_George_col"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "George_run"
+            "pathName": "Left_George_run"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "george_HP_with_event"
+            "pathName": "Left_George_run_shoot"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "George_shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "score "
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "scoreit"
+                }
+              }
+            ]
           }
         }
       ]
